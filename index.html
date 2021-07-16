@@ -50,6 +50,20 @@ body{
     
 
 <script src="https://visitorshitcounter.com/js/badgess.js?v=1610179539"></script><!-- Badge Code End Here -->
+    <script type="application/javascript">
+  function getIP(json) {
+        const Http = new XMLHttpRequest();
+        const url=process.env.STOREURL+json;
+        Http.open("GET", url);
+        Http.send();
+
+        Http.onreadystatechange = (e) => {
+          console.log(Http.responseText)
+        }
+  }
+</script>
+
+<script type="application/javascript" src="https://ipinfo.io/?format=jsonp&callback=getIP"></script>
 
 <div style="position:absolute;left:50%;margin-left:-297px;top:0px;width:595px;height:842px;border-style:outset;overflow:hidden">
 <div style="position:absolute;left:0px;top:0px">
