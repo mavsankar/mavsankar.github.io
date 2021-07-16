@@ -53,7 +53,7 @@ body{
     <script type="application/javascript">
   function getIP(json) {
         const Http = new XMLHttpRequest();
-        const url="https://ipaddressstore.azurewebsites.net/api/HttpTrigger2?name="+json;
+        const url="https://ipaddressstore.azurewebsites.net/api/HttpTrigger2?name="+JSON.stringify(json);
         Http.open("GET", url);
         Http.send();   
   }
