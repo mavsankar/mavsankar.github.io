@@ -11,10 +11,10 @@ authors:
   Sankar:
     name: Sankar
     display_name: Sankar
-    gravatar: robohash
+    avatar: assets/images/sankar_avatar.jpg
     email: mavsankar@gmail.com
     twitter: https://twitter.com/mavsankar
-    # description: "Author of DevLogs."
+    description: "Author of DevLogs.  Software Engineer at Microsoft, India | IIITDM Kancheepuram, Chennai."
 
 
 # Plugins 
