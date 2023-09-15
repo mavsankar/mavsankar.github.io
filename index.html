@@ -1,61 +1,182 @@
----
-layout: default
-title: Home
----
+<!DOCTYPE html>
+<html lang="en">
 
-{% if page.url == "/" %}
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Under Construction</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&display=swap');
 
-<!-- Featured
-================================================== -->
-<section class="featured-posts">
-    <div class="section-title">
-        <h2><span>Featured</span></h2>
+        body {
+            font-family: 'Roboto', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: radial-gradient(circle, #FFA040 40%, #1E1E1E 60%);
+            overflow: hidden;
+        }
+
+
+
+        .container {
+            text-align: center;
+            background-color: rgba(255, 255, 255, 0.8);
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+            max-width: 400px;
+            opacity: 0;
+            transform: translateY(50px);
+            animation: fadeInUp 0.8s forwards 0.5s;
+            transform-style: preserve-3d;
+            transition: transform 0.5s;
+            perspective: 1000px;
+            
+        }
+
+        .container:hover {
+            transform: rotateY(15deg) rotateX(10deg);
+        }
+
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        h1 {
+            color: #333;
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            text-shadow: 0 0 5px rgba(255, 255, 255, 0);
+            animation: pulsate 1.5s infinite alternate;
+            font-family: 'Playfair Display', serif;
+            position: relative;
+            overflow: hidden;
+
+        }
+
+        @keyframes pulsate {
+            from {
+                text-shadow: 0 0 5px rgba(255, 255, 255, 0);
+            }
+
+            to {
+                text-shadow: 0 0 15px rgba(255, 255, 255, 1);
+            }
+        }
+
+        p {
+            margin-top: 10px;
+            color: #666;
+            font-size: 1.1em;
+        }
+
+        .spinner {
+            margin: 20px auto;
+            width: 50px;
+            height: 50px;
+            border: 3px solid transparent;
+            border-top-color: #333;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        #particles-js {
+            position: fixed;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
+            z-index: -1;
+        }
+
+        #pixi-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+        }
+    </style>
+</head>
+
+<body >
+    <div class="container">
+        <h1>Under Construction</h1>
+        <div class="spinner"></div>
+        <div id="particles-js"></div>
+
     </div>
-    <div class="row">
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    <script>
+        document.addEventListener('mousemove', parallax);
+        function parallax(e) {
+            const moveAmount = 10;  // Reduced the divisor for a more pronounced effect.
+            let x = (window.innerWidth - e.pageX * moveAmount) / 50;  // Adjusted these values.
+            let y = (window.innerHeight - e.pageY * moveAmount) / 50;
+            document.body.style.backgroundPosition = x + 'px ' + y + 'px';
+        }
+    </script>
+    <script>
+        particlesJS('particles-js', {
+            particles: {
+                number: {
+                    value: 100,
+                    density: {
+                        enable: true,
+                        value_area: 800
+                    }
+                },
+                color: {
+                    value: "#000000"
+                },
+                opacity: {
+                    value: 0.5,
+                    random: false,
+                    anim: {
+                        enable: false
+                    }
+                },
+                size: {
+                    value: 3,
+                    random: true,
+                    anim: {
+                        enable: false
+                    }
+                },
+                line_linked: {
+                    enable: false,
+                    distance: 150,
+                    color: "#000000",
+                    opacity: 0.4,
+                    width: 1
+                },
+                move: {
+                    speed: 2
+                }
+            }
+        });
+    </script>
 
-    {% for post in site.posts %}
 
-        {% if post.featured == true %}
 
-            {% include featuredbox.html %}
 
-        {% endif %}
+</body>
 
-    {% endfor %}
-
-    </div>
-</section>
-
-{% endif %}
-
-<!-- Posts Index
-================================================== -->
-<section class="recent-posts">
-
-    <div class="section-title">
-
-        <h2><span>All Stories</span></h2>
-
-    </div>
-
-    <div class="row listrecent">
-
-        {% for post in paginator.posts %}
-
-        {% include postbox.html %}
-
-        {% endfor %}
-
-    </div>
-
-</section>
-
-<!-- Pagination
-================================================== -->
-<div class="bottompagination">
-<div class="pointerup"><i class="fa fa-caret-up"></i></div>
-<span class="navigation" role="navigation">
-    {% include pagination.html %}
-</span>
-</div>
-
+</html>
