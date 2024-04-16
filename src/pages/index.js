@@ -71,7 +71,7 @@ const IndexPage = () => {
 
           <p className="mb-4">
             In my free time, I enjoy playing chess and watching anime. Recently, I have been exploring the world of Machine Learning and AI.
-            I also started writing technical blogs, please check it out <Link href="https://blog.mavsankar.com" target='_blank' className='hover:underline'>here</Link> and let me know your thoughts.
+            I also started writing technical blogs, please check it out <Link href="https://blog.mavsankar.com" target='_blank' className='underline'>here</Link> and let me know your thoughts.
           </p>
 
           {/* Timeline */}
