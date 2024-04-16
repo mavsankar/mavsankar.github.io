@@ -4,6 +4,7 @@ import * as icons from 'react-icons/ri';
 import * as md_icons from "react-icons/md";
 import { Link } from 'gatsby';
 import Sidebar from '../components/sidebar';
+import cv from '../assets/files/Software_Engineer_Resume.pdf';
 
 const Layout = ({ pageTitle, children }) => {
   const [darkMode, setDarkMode] = useState(false);
@@ -69,7 +70,7 @@ const Layout = ({ pageTitle, children }) => {
                   <li><Link to="/" className='hover:underline'>About</Link></li>
                   {/* <li><Link to="/projects" className='hover:underline'>Projects</Link></li> */}
                   <li><Link href="https://blog.mavsankar.com" target='_blank' className='hover:underline'>Blog</Link></li>
-                  <li><Link href="https://drive.google.com/" target='_blank' rel="noreferrer" className='hover:underline'>CV</Link></li>
+                  <li><Link href={cv} target='_blank' rel="noreferrer" className='hover:underline'>CV</Link></li>
                   <div className="cursor-pointer inset-x-0 inset-y-0" onClick={handleToggleDarkMode}>
                     {darkMode ? <icons.RiSunFill className="text-slate-800 dark:text-white hover:scale-150 duration-300" size={18}/> : <icons.RiMoonFill className="text-slate-800 dark:text-white hover:scale-150 duration-300" size={18} />}
                   </div>

@@ -5,6 +5,7 @@ import { ExperienceEntry, EducationEntry, PublicationEntry } from '../components
 import { Link } from 'gatsby';
 import * as icons from 'react-icons/ri';
 import scrollTo from 'gatsby-plugin-smoothscroll';
+import cv from '../assets/files/Software_Engineer_Resume.pdf';
 
 const IndexPage = () => {
   return (
@@ -32,7 +33,7 @@ const IndexPage = () => {
             {/* <Link href="https://scholar.google.com/" target='_blank' className='hover:scale-125 cursor-pointer transition ease-in-out duration-300' aria-label='Google Scholar'>
               <i className="ai ai-google-scholar ai-size-32"></i>
             </Link> */}
-            <Link href="https://drive.google.com/" target='_blank' className='hover:scale-125 cursor-pointer transition ease-in-out duration-300' aria-label='CV'>
+            <Link href={cv} target='_blank' className='hover:scale-125 cursor-pointer transition ease-in-out duration-300' aria-label='CV'>
               <i className="ai ai-cv ai-size-32"></i>
             </Link>
           </div>
@@ -63,7 +64,7 @@ const IndexPage = () => {
           <h1 className="text-3xl font-bold mb-4">Hi, I'm Sankar!</h1>
 
           <p className="mb-4">
-            I am a Software Engineer II at Microsoft passionate about building scalable and reliable systems.
+            I am a Software Engineer II at Microsoft, passionate about building scalable and reliable systems.
             I have worked on the design and development of high-scale APIs using .NET and Azure technologies for projects like Repair and Warranty processes of Microsoft Devices and Testing Platform.
             Implemented scalable solutions that boosted system performance for large-scale applications.
           </p>
