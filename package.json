@@ -1,6 +1,7 @@
 {
   "name": "elegant-portfolio",
   "version": "1.0.0",
+  "homepage": "https://mavsankar.github.io",
   "private": true,
   "description": "elegant-portfolio",
   "author": "id521",
@@ -9,6 +10,8 @@
   ],
   "scripts": {
     "develop": "gatsby develop",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d public",
     "start": "gatsby develop",
     "build": "gatsby build",
     "serve": "gatsby serve",
@@ -35,5 +38,8 @@
     "react-icons": "^4.7.1",
     "react-vertical-timeline-component": "^3.6.0",
     "tailwindcss": "^3.3.3"
+  },
+  "devDependencies": {
+    "gh-pages": "^6.1.1"
   }
 }
