@@ -10,7 +10,7 @@
   ],
   "scripts": {
     "develop": "gatsby develop",
-    "predeploy": "npm run build",
+    "predeploy": "npm run build && echo 'www.mavsankar.com' > public/CNAME",
     "deploy": "gh-pages -d public",
     "start": "gatsby develop",
     "build": "gatsby build",
