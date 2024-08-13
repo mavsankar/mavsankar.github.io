@@ -8,8 +8,8 @@ import cv from '../assets/files/Software_Engineer_Resume.pdf';
 
 const Layout = ({ pageTitle, children }) => {
   const [darkMode, setDarkMode] = useState(false);
-
-  const [isOpen, setIsOpen] = useState(false)
+  const [isOpen, setIsOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(true); // Loading state
   const menuRef = useRef();
 
   useEffect(() => {
@@ -47,9 +47,43 @@ const Layout = ({ pageTitle, children }) => {
     return () => window.removeEventListener('resize', handleResize);
   }, [isOpen]);
 
-  
+  // Simulate loading for 3 seconds
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 1500);
+    return () => clearTimeout(timer);
+  }, []);
 
-  return ( 
+  if (isLoading) {
+    return (
+      <div className={`flex flex-col w-full min-h-screen h-full ${darkMode ? 'dark bg-slate-800' : 'light bg-slate-50'}`}>
+      <div className="flex items-center justify-center flex-grow">
+        <div className="terminal">
+          <div className="terminal-header">
+            <div className="buttons">
+              <span className="close"></span>
+              <span className="minimize"></span>
+              <span className="maximize"></span>
+            </div>
+            <div className="title">Status</div>
+          </div>
+          <div className="terminal-body">
+            <div className="terminal-loader">
+              <span className="loader-text">Loading</span>
+              <span id="dot1" className="dot">.</span>
+              <span id="dot2" className="dot">.</span>
+              <span id="dot3" className="dot">.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    );
+  }
+
+  return (
     <div className={`flex flex-col w-full min-h-screen h-full ${darkMode ? 'dark bg-slate-800' : 'light bg-slate-50'} transition ease-in-out duration-500`}>
       <header className="3xl:w-[1792px] 3xl:mx-auto text-slate-500 bg-slate-50 dark:bg-slate-800 dark:text-white pt-2 sticky top-0 z-50 transition ease-in-out duration-500">
         <div className="container mx-auto w-5/6">
@@ -72,7 +106,7 @@ const Layout = ({ pageTitle, children }) => {
                   <li><Link href="https://blog.mavsankar.com" target='_blank' className='hover:underline'>Blog</Link></li>
                   <li><Link href={cv} target='_blank' rel="noreferrer" className='hover:underline'>CV</Link></li>
                   <div className="cursor-pointer inset-x-0 inset-y-0" onClick={handleToggleDarkMode}>
-                    {darkMode ? <icons.RiSunFill className="text-slate-800 dark:text-white hover:scale-150 duration-300" size={18}/> : <icons.RiMoonFill className="text-slate-800 dark:text-white hover:scale-150 duration-300" size={18} />}
+                    {darkMode ? <icons.RiSunFill className="text-slate-800 dark:text-white hover:scale-150 duration-300" size={18} /> : <icons.RiMoonFill className="text-slate-800 dark:text-white hover:scale-150 duration-300" size={18} />}
                   </div>
                 </ul>
               </nav>
@@ -83,24 +117,24 @@ const Layout = ({ pageTitle, children }) => {
               <Sidebar isOpen={isOpen} setIsOpen={setIsOpen}>
                 <div className={`flex flex-col h-full w-48 ${darkMode ? 'dark bg-slate-100' : 'light bg-slate-800'} transition ease-in-out duration-500`}>
                   <div className="pl-4 pt-4 pb-2 inset-x-0 inset-y-0">
-                    <md_icons.MdArrowForwardIos className="cursor-pointer text-white dark:text-slate-500 hover:scale-150 duration-300" size={18} onClick={()=>setIsOpen(false)}/>
+                    <md_icons.MdArrowForwardIos className="cursor-pointer text-white dark:text-slate-500 hover:scale-150 duration-300" size={18} onClick={() => setIsOpen(false)} />
                   </div>
-                  <Link to="/" className={`flex w-full justify-center text-center px-4 py-2 text-white dark:text-slate-500 hover:bg-slate-700 dark:hover:bg-slate-200 hover:underline`} onClick={()=>setIsOpen(false)}> About </Link>
+                  <Link to="/" className={`flex w-full justify-center text-center px-4 py-2 text-white dark:text-slate-500 hover:bg-slate-700 dark:hover:bg-slate-200 hover:underline`} onClick={() => setIsOpen(false)}> About </Link>
                   {/* <Link to="/projects" className={`flex w-full justify-center text-center px-4 py-2 text-white dark:text-slate-500 hover:bg-slate-700 dark:hover:bg-slate-200 hover:underline`} onClick={()=>setIsOpen(false)}> Projects </Link> */}
-                  <Link href="https://blog.mavsankar.com" target='_blank' className={`flex w-full justify-center text-center px-4 py-2 text-white dark:text-slate-500 hover:bg-slate-700 dark:hover:bg-slate-200 hover:underline`} onClick={()=>setIsOpen(false)}> Blog </Link>
-                  <Link href={cv} target='_blank' className={`flex w-full justify-center text-center px-4 py-2 text-white dark:text-slate-500 hover:bg-slate-700 dark:hover:bg-slate-200 hover:underline`} onClick={()=>setIsOpen(false)}> CV </Link>
+                  <Link href="https://blog.mavsankar.com" target='_blank' className={`flex w-full justify-center text-center px-4 py-2 text-white dark:text-slate-500 hover:bg-slate-700 dark:hover:bg-slate-200 hover:underline`} onClick={() => setIsOpen(false)}> Blog </Link>
+                  <Link href={cv} target='_blank' className={`flex w-full justify-center text-center px-4 py-2 text-white dark:text-slate-500 hover:bg-slate-700 dark:hover:bg-slate-200 hover:underline`} onClick={() => setIsOpen(false)}> CV </Link>
                   <div className="flex justify-center text-center inset-x-0 inset-y-0 px-4 py-2" onClick={handleToggleDarkMode}>
-                    {darkMode ? <icons.RiSunFill className="cursor-pointer text-white dark:text-slate-800 hover:scale-150 duration-300" size={18}/> : <icons.RiMoonFill className="cursor-pointer text-white dark:text-slate-800 hover:scale-150 duration-300" size={18} />}
+                    {darkMode ? <icons.RiSunFill className="cursor-pointer text-white dark:text-slate-800 hover:scale-150 duration-300" size={18} /> : <icons.RiMoonFill className="cursor-pointer text-white dark:text-slate-800 hover:scale-150 duration-300" size={18} />}
                   </div>
                 </div>
               </Sidebar>
             </div>
-            
+
           </div>
         </div>
 
         <div>
-          <hr className="mt-2 border-2 border-slate-800 dark:border-white"/>
+          <hr className="mt-2 border-2 border-slate-800 dark:border-white" />
         </div>
 
       </header>
@@ -112,13 +146,13 @@ const Layout = ({ pageTitle, children }) => {
         </div>
 
         <div className="py-4">
-          <hr className="border-1 border-slate-800 dark:border-white"/>
+          <hr className="border-1 border-slate-800 dark:border-white" />
         </div>
 
         <footer className="container mx-auto text-center text-sm pb-2">
-        <p class="cp-text">
-          © {new Date().getFullYear()} <span className="font-bold">Inspired by <Link href='https://www.github.com/ibrahim-didi/elegant-portfolio'>elegant-portfolio</Link>.</span>
-        </p>
+          <p class="cp-text">
+            © {new Date().getFullYear()} <span className="font-bold">Inspired by <Link href='https://www.github.com/ibrahim-didi/elegant-portfolio'>elegant-portfolio</Link>.</span>
+          </p>
         </footer>
       </main>
     </div>
