@@ -131,18 +131,18 @@ const IndexPage = () => {
             <div id="publications" className='-translate-y-16' />
             <h1 className='text-2xl py-4 font-medium'>Publications</h1>
             <PublicationEntry
-              date={'2021'}
-              title={'Prediction of Adverse Drug Reactions Using Drug Convolutional Neural Networks'}
-              authors={'Anjani Sankar Mantripragada, Sai Phani Teja, Rohith Reddy Katasani, Pratik Joshi, Masilamani V, Raj Ramesh'}
-              journal={'Journal of Bioinformatics and Computational Biology'}
-              tags={['DOI: https://doi.org/10.1142/S0219720020500468']}
-            />
-            <PublicationEntry
               date={'2025'}
               title={'A Robust Machine Learning Framework for Predicting Slag Eye Formation in Industrial Steelmaking Ladles'}
               authors={'Somenath Mukherjee, MA Sankar, Vishnu Teja Mantripragada'}
               journal={'Metallurgical and Materials Transactions B'}
               tags={['DOI: https://doi.org/10.1007/s11663-025-03670-0' ]}
+            />
+            <PublicationEntry
+              date={'2021'}
+              title={'Prediction of Adverse Drug Reactions Using Drug Convolutional Neural Networks'}
+              authors={'Anjani Sankar Mantripragada, Sai Phani Teja, Rohith Reddy Katasani, Pratik Joshi, Masilamani V, Raj Ramesh'}
+              journal={'Journal of Bioinformatics and Computational Biology'}
+              tags={['DOI: https://doi.org/10.1142/S0219720020500468']}
             />
           </section>
 

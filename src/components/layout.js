@@ -9,7 +9,6 @@ import cv from '../assets/files/Software_Engineer_Resume.pdf';
 const Layout = ({ pageTitle, children }) => {
   const [darkMode, setDarkMode] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState(true); // Loading state
   const menuRef = useRef();
 
   useEffect(() => {
@@ -46,42 +45,6 @@ const Layout = ({ pageTitle, children }) => {
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, [isOpen]);
-
-  // Simulate loading for 3 seconds
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 1500);
-    return () => clearTimeout(timer);
-  }, []);
-
-  if (isLoading) {
-    return (
-      <div className={`flex flex-col w-full min-h-screen h-full ${darkMode ? 'dark bg-slate-800' : 'light bg-slate-50'}`}>
-      <div className="flex items-center justify-center flex-grow">
-        <div className="terminal">
-          <div className="terminal-header">
-            <div className="buttons">
-              <span className="close"></span>
-              <span className="minimize"></span>
-              <span className="maximize"></span>
-            </div>
-            <div className="title">Status</div>
-          </div>
-          <div className="terminal-body">
-            <div className="terminal-loader">
-              <span className="loader-text">Loading</span>
-              <span id="dot1" className="dot">.</span>
-              <span id="dot2" className="dot">.</span>
-              <span id="dot3" className="dot">.</span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-    
-    );
-  }
 
   return (
     <div className={`flex flex-col w-full min-h-screen h-full ${darkMode ? 'dark bg-slate-800' : 'light bg-slate-50'} transition ease-in-out duration-500`}>
