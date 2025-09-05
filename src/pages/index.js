@@ -112,7 +112,7 @@ const IndexPage = () => {
             <div id="education" className='-translate-y-16' />
             <h1 className='text-2xl py-4 font-medium'>Education</h1>
             <EducationEntry
-              date={'2023 - Ongoing'}
+              date={'2023 - 2024'}
               university={'Bits Pilani'}
               degree={'M.Tech'}
               description={'Software Systems'}
