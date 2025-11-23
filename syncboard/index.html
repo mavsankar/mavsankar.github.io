@@ -243,10 +243,18 @@
 
     <!-- Footer Stats -->
     <footer class="h-8 bg-black/40 border-t border-white/5 flex items-center justify-between px-4 text-[10px] text-slate-500 shrink-0 z-20 safe-area-bottom">
-        <div class="flex items-center gap-2">
-            <i class="fa-solid fa-shield-halved text-emerald-500/80"></i>
-            <span class="hidden xs:inline">End-to-End Encrypted</span>
-            <span class="xs:hidden">E2EE</span>
+        <div class="flex items-center gap-4">
+            <!-- New: Device Identity Display -->
+            <div class="flex items-center gap-2" title="Your Device Identity">
+                <i class="fa-solid fa-fingerprint text-indigo-400"></i>
+                <span id="my-device-id" class="font-mono text-slate-300 font-bold">Identifying...</span>
+            </div>
+            
+            <!-- Encryption Status (Hidden on small mobile to fit ID) -->
+            <div class="hidden sm:flex items-center gap-2">
+                <i class="fa-solid fa-shield-halved text-emerald-500/80"></i>
+                <span>End-to-End Encrypted</span>
+            </div>
         </div>
         <div id="peer-count">
             <i class="fa-solid fa-user-group mr-1"></i> 1
@@ -402,6 +410,7 @@
             dropZone: document.getElementById('drop-zone'),
             fileInput: document.getElementById('file-input'),
             emptyFiles: document.getElementById('empty-files'),
+            myDeviceId: document.getElementById('my-device-id'), // Added reference
             tabs: {
                 text: document.getElementById('tab-text'),
                 files: document.getElementById('tab-files'),
@@ -425,11 +434,15 @@
             isHost: false,
             isInternalUpdate: false,
             approvedPeers: new Set(),
-            knockInterval: null
+            knockInterval: null,
+            myDeviceName: null // Stored device name
         };
 
         // --- Helper: Identify Device ---
         function getDeviceInfo() {
+            // Check if we already have a generated name to be consistent
+            if (state.myDeviceName) return state.myDeviceName;
+
             const ua = navigator.userAgent;
             let os = "Unknown Device";
             if (ua.indexOf("Win") !== -1) os = "Windows PC";
@@ -449,6 +462,10 @@
         state.isHost = !hostIdParam;
 
         function init() {
+            // Initialize device name once and display it
+            state.myDeviceName = getDeviceInfo();
+            if(dom.myDeviceId) dom.myDeviceId.innerText = state.myDeviceName;
+
             state.peer = new Peer(null, { debug: 1 });
 
             state.peer.on('open', (id) => {
@@ -538,7 +555,7 @@
             console.log("Sending knock...");
             conn.send({ 
                 type: 'knock', 
-                device: getDeviceInfo() 
+                device: state.myDeviceName // Use consistent stored name
             });
         }
 
@@ -716,7 +733,9 @@
                 dom.text.dispatchEvent(new Event('input'));
             });
 
-            dom.dropZone.addEventListener('click', () => dom.fileInput.click());
+            // FIX: Removed the redundant click listener on dropZone to prevent double-open loop
+            // The file input inside the dropZone handles the click natively
+            
             dom.dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dom.dropZone.classList.add('drag-active'); });
             dom.dropZone.addEventListener('dragleave', () => dom.dropZone.classList.remove('drag-active'));
             dom.dropZone.addEventListener('drop', (e) => {
@@ -726,6 +745,8 @@
             });
             dom.fileInput.addEventListener('change', (e) => {
                 if (e.target.files.length) sendFile(e.target.files[0]);
+                // Clear input so selecting the same file again works
+                dom.fileInput.value = ''; 
             });
 
             // Mobile Tabs
