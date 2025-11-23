@@ -3,459 +3,662 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SyncBoard | Serverless P2P Clipboard</title>
+    <title>SyncBoard | P2P Ecosystem</title>
     
-    <!-- Tailwind CSS for Styling -->
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- PeerJS for WebRTC (Peer-to-Peer Networking) -->
+    <!-- PeerJS -->
     <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
     
-    <!-- QR Code Generator -->
+    <!-- QR Code -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
     <!-- Icons -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 
+    <!-- Google Fonts -->
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;600&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+        :root {
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --glass-bg: rgba(17, 24, 39, 0.7);
+            --accent-gradient: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+        }
 
         body {
-            font-family: 'Inter', sans-serif;
-            background-color: #0f172a;
-            color: #e2e8f0;
+            font-family: 'Outfit', sans-serif;
+            background-color: #000;
+            color: #fff;
+            overflow: hidden; /* Prevent body scroll, handle inside containers */
         }
 
-        .mono {
-            font-family: 'JetBrains Mono', monospace;
+        .font-mono { font-family: 'JetBrains Mono', monospace; }
+
+        /* Animated Background */
+        .bg-gradient-mesh {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background: radial-gradient(circle at 15% 50%, rgba(76, 29, 149, 0.4), transparent 25%),
+                        radial-gradient(circle at 85% 30%, rgba(37, 99, 235, 0.4), transparent 25%);
+            z-index: -1;
         }
 
-        /* Custom Scrollbar */
-        textarea::-webkit-scrollbar {
-            width: 10px;
+        /* Glassmorphism Utilities */
+        .glass-panel {
+            background: var(--glass-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border);
         }
-        textarea::-webkit-scrollbar-track {
-            background: #1e293b; 
+
+        .glass-button {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.2s ease;
         }
-        textarea::-webkit-scrollbar-thumb {
-            background: #475569; 
-            border-radius: 5px;
+        .glass-button:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.2);
+            transform: translateY(-1px);
         }
-        textarea::-webkit-scrollbar-thumb:hover {
-            background: #64748b; 
+
+        /* Scrollbars */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.3); }
+
+        /* File Drop Zone Animation */
+        .drag-active {
+            border-color: #8b5cf6 !important;
+            background: rgba(139, 92, 246, 0.1) !important;
+            transform: scale(1.02);
         }
 
         /* Animations */
-        @keyframes pulse-ring {
-            0% { transform: scale(0.8); box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.7); }
-            70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(59, 130, 246, 0); }
-            100% { transform: scale(0.8); box-shadow: 0 0 0 0 rgba(59, 130, 246, 0); }
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
         }
-        
-        .pulse-ring {
-            animation: pulse-ring 2s infinite;
+        .animate-float { animation: float 6s ease-in-out infinite; }
+
+        .slide-up { animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
     </style>
 </head>
-<body class="h-screen flex flex-col overflow-hidden selection:bg-blue-500 selection:text-white">
+<body class="h-screen flex flex-col relative">
 
-    <!-- Header -->
-    <header class="bg-slate-900 border-b border-slate-700 p-4 flex justify-between items-center shadow-lg z-10">
+    <!-- Dynamic Background -->
+    <div class="bg-gradient-mesh"></div>
+
+    <!-- Navbar -->
+    <nav class="h-16 border-b border-white/5 bg-black/20 backdrop-blur-md flex items-center justify-between px-4 z-20 shrink-0">
         <div class="flex items-center gap-3">
-            <div class="bg-blue-600 p-2 rounded-lg shadow-blue-500/20 shadow-lg">
-                <i class="fa-solid fa-bolt text-white"></i>
+            <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-purple-500/20">
+                <i class="fa-solid fa-infinity text-white text-sm"></i>
             </div>
             <div>
-                <h1 class="font-bold text-lg tracking-tight text-white leading-tight">SyncBoard</h1>
-                <div id="status-indicator" class="flex items-center gap-2 text-xs text-slate-400">
-                    <span class="w-2 h-2 rounded-full bg-yellow-500 animate-pulse" id="status-dot"></span>
-                    <span id="status-text">Initializing P2P...</span>
+                <h1 class="font-bold text-lg leading-none tracking-tight">SyncBoard</h1>
+                <div class="flex items-center gap-2 mt-0.5">
+                    <div id="status-dot" class="w-1.5 h-1.5 rounded-full bg-yellow-500 animate-pulse"></div>
+                    <span id="status-text" class="text-[10px] font-medium text-slate-400 uppercase tracking-wider">Initializing...</span>
                 </div>
             </div>
         </div>
 
-        <div class="flex gap-2">
-            <button id="join-btn" class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-3 py-2 rounded-md text-sm font-medium transition-colors border border-slate-600 flex items-center gap-2">
-                <i class="fa-solid fa-plug"></i> <span class="hidden sm:inline">Join Manually</span>
-            </button>
-            <button id="share-btn" class="hidden bg-blue-600 hover:bg-blue-500 text-white px-3 py-2 rounded-md text-sm font-medium transition-colors border border-blue-500 shadow-lg shadow-blue-600/20 flex items-center gap-2">
-                <i class="fa-solid fa-qrcode"></i> <span class="hidden sm:inline">Connect Device</span>
-            </button>
-            <button id="clear-btn" class="hover:bg-red-500/10 hover:text-red-400 text-slate-400 px-3 py-2 rounded-md text-sm transition-colors" title="Clear Board">
-                <i class="fa-solid fa-trash"></i>
-            </button>
-        </div>
-    </header>
-
-    <!-- Main Content -->
-    <main class="flex-1 relative flex flex-col">
-        <div class="absolute inset-0 bg-slate-900/50 pointer-events-none z-0"></div>
-        
-        <!-- The Clipboard Area -->
-        <textarea 
-            id="clipboard-area" 
-            class="w-full h-full bg-slate-800 text-slate-200 p-6 text-lg md:text-xl outline-none resize-none mono leading-relaxed z-0 placeholder-slate-600"
-            placeholder="Type or paste here... content will sync instantly across connected devices."
-            spellcheck="false"
-        ></textarea>
-
-        <!-- Copy Confirmation Overlay -->
-        <div id="copy-overlay" class="absolute inset-0 flex items-center justify-center pointer-events-none opacity-0 transition-opacity duration-300 z-10 bg-black/20 backdrop-blur-sm">
-            <div class="bg-slate-800 border border-slate-600 text-white px-6 py-4 rounded-xl shadow-2xl transform scale-95 transition-transform duration-200 flex flex-col items-center gap-2">
-                <i class="fa-solid fa-check-circle text-green-500 text-3xl"></i>
-                <span class="font-bold">Copied to Clipboard</span>
+        <div class="flex items-center gap-2">
+            <!-- Mobile Tabs Toggle (Hidden on Desktop) -->
+            <div class="flex md:hidden bg-white/5 rounded-lg p-1 border border-white/5 mr-2">
+                <button id="tab-text" class="px-3 py-1.5 rounded-md text-xs font-medium bg-white/10 text-white transition-all">Text</button>
+                <button id="tab-files" class="px-3 py-1.5 rounded-md text-xs font-medium text-slate-400 hover:text-white transition-all">Files</button>
             </div>
+
+            <button id="join-btn" class="glass-button text-slate-300 px-3 py-2 rounded-lg text-xs font-semibold flex items-center gap-2">
+                <i class="fa-solid fa-link"></i> <span class="hidden sm:inline">Join</span>
+            </button>
+            <button id="share-btn" class="hidden bg-white text-black hover:bg-slate-200 px-4 py-2 rounded-lg text-xs font-bold transition shadow-lg shadow-white/10 flex items-center gap-2">
+                <i class="fa-solid fa-qrcode"></i> <span class="hidden sm:inline">Connect</span>
+            </button>
         </div>
+    </nav>
+
+    <!-- Main Workspace -->
+    <main class="flex-1 flex overflow-hidden relative z-10">
+        
+        <!-- Left Panel: Text Editor -->
+        <section id="panel-text" class="flex-1 flex flex-col p-4 md:p-6 transition-all duration-300 absolute inset-0 md:relative md:translate-x-0 z-10 bg-black/0">
+            <div class="glass-panel flex-1 rounded-2xl flex flex-col overflow-hidden shadow-2xl relative group">
+                <!-- Toolbar -->
+                <div class="h-10 border-b border-white/5 flex items-center justify-between px-4 bg-white/[0.02]">
+                    <span class="text-xs font-mono text-slate-500">PLAIN TEXT</span>
+                    <div class="flex gap-2">
+                        <button id="clear-btn" class="text-slate-500 hover:text-red-400 transition text-xs" title="Clear"><i class="fa-solid fa-trash"></i></button>
+                        <button id="copy-btn" class="text-slate-500 hover:text-indigo-400 transition text-xs" title="Copy"><i class="fa-solid fa-copy"></i></button>
+                    </div>
+                </div>
+                
+                <textarea 
+                    id="clipboard-area" 
+                    class="flex-1 bg-transparent text-slate-200 p-6 text-base md:text-lg resize-none outline-none font-mono leading-relaxed placeholder-slate-700"
+                    placeholder="Type or paste text here to sync..."
+                    spellcheck="false"
+                ></textarea>
+
+                <!-- Status Footer -->
+                <div class="h-8 border-t border-white/5 flex items-center px-4 bg-black/20 text-[10px] text-slate-500 font-mono justify-between">
+                    <span id="char-count">0 chars</span>
+                    <span id="last-sync">Synced: Never</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Right Panel: File Transfer -->
+        <section id="panel-files" class="flex-1 flex flex-col p-4 md:p-6 transition-all duration-300 absolute inset-0 translate-x-full md:relative md:translate-x-0 z-10 bg-black/0 md:border-l md:border-white/5">
+            <div class="h-full flex flex-col gap-4">
+                
+                <!-- Drop Zone -->
+                <div id="drop-zone" class="h-48 glass-panel rounded-2xl border-dashed border-2 border-white/10 flex flex-col items-center justify-center text-center cursor-pointer hover:border-indigo-500/50 hover:bg-indigo-500/5 transition-all group relative overflow-hidden">
+                    <input type="file" id="file-input" class="absolute inset-0 opacity-0 cursor-pointer z-20">
+                    <div class="z-10 pointer-events-none transform group-hover:scale-110 transition-transform duration-300">
+                        <div class="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center mx-auto mb-3 border border-white/10 group-hover:border-indigo-500/50">
+                            <i class="fa-solid fa-cloud-arrow-up text-slate-400 group-hover:text-indigo-400 text-xl"></i>
+                        </div>
+                        <h3 class="text-sm font-semibold text-slate-200">Drop files to send</h3>
+                        <p class="text-xs text-slate-500 mt-1">or click to browse</p>
+                    </div>
+                </div>
+
+                <!-- File List -->
+                <div class="flex-1 glass-panel rounded-2xl flex flex-col overflow-hidden">
+                    <div class="h-10 border-b border-white/5 flex items-center px-4 bg-white/[0.02]">
+                        <span class="text-xs font-mono text-slate-500">TRANSFER HISTORY</span>
+                    </div>
+                    <div id="file-list" class="flex-1 overflow-y-auto p-2 space-y-2">
+                        <!-- Empty State -->
+                        <div id="empty-files" class="h-full flex flex-col items-center justify-center text-slate-600 opacity-50">
+                            <i class="fa-solid fa-box-open text-2xl mb-2"></i>
+                            <span class="text-xs">No files shared yet</span>
+                        </div>
+                        <!-- File items will be injected here -->
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
     </main>
 
-    <!-- Footer / Actions -->
-    <footer class="bg-slate-900 border-t border-slate-700 p-3 flex justify-between items-center text-xs text-slate-500">
-        <div class="flex items-center gap-4">
-            <span id="peer-count" class="flex items-center gap-1">
-                <i class="fa-solid fa-users"></i> 1 Active
-            </span>
-            <span class="hidden sm:inline"> | Data is encrypted & P2P. No database.</span>
+    <!-- Footer Stats -->
+    <footer class="h-8 bg-black/40 border-t border-white/5 flex items-center justify-between px-4 text-[10px] text-slate-500 shrink-0 relative z-20">
+        <div class="flex items-center gap-2">
+            <i class="fa-solid fa-shield-halved text-emerald-500/80"></i>
+            <span>End-to-End Encrypted via WebRTC</span>
         </div>
-        <button id="copy-btn" class="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-md font-bold transition shadow-lg shadow-blue-600/20 active:scale-95 flex items-center gap-2">
-            <i class="fa-regular fa-copy"></i> Copy Text
-        </button>
+        <div id="peer-count">
+            <i class="fa-solid fa-user-group mr-1"></i> 1 Device
+        </div>
     </footer>
 
-    <!-- QR Modal -->
-    <div id="qr-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-300">
-        <div class="bg-slate-800 p-6 rounded-xl border border-slate-600 shadow-2xl max-w-sm w-full mx-4 transform scale-95 transition-transform duration-300" id="qr-content">
-            <div class="flex justify-between items-center mb-4">
-                <h3 class="text-white font-bold text-lg">Scan to Connect</h3>
-                <button id="close-qr" class="text-slate-400 hover:text-white transition"><i class="fa-solid fa-xmark text-xl"></i></button>
+    <!-- Modals (QR & Join) -->
+    <div id="modal-overlay" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-300 flex items-center justify-center">
+        
+        <!-- QR Modal -->
+        <div id="qr-content" class="glass-panel p-6 rounded-2xl w-full max-w-sm mx-4 transform scale-95 transition-transform duration-300 hidden">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="font-bold text-lg">Connect Device</h3>
+                <button class="close-modal text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
             </div>
-
-            <!-- Warning for AI/Preview Environments -->
-            <div class="bg-yellow-500/10 border border-yellow-500/20 rounded p-3 mb-4 text-yellow-200 text-xs">
-                <i class="fa-solid fa-triangle-exclamation mr-1"></i> 
-                If the QR code gives a 404 error, you are likely in a private preview. Deploy this file to a public server (like Netlify) or use the Manual ID below.
-            </div>
-            
-            <div class="bg-white p-4 rounded-lg flex justify-center mb-4 relative group">
+            <div class="bg-white p-4 rounded-xl flex justify-center mb-6">
                 <div id="qrcode"></div>
-                <!-- Visual hint to scan -->
-                <div class="absolute inset-0 flex items-center justify-center pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity">
-                    <div class="bg-black/70 text-white text-xs px-2 py-1 rounded">Scan with Camera</div>
-                </div>
             </div>
-
-            <div class="bg-slate-900 p-3 rounded border border-slate-700 mb-4">
-                <label class="text-xs text-slate-500 block mb-1">Session ID (Manual Entry)</label>
-                <div class="flex items-center justify-between gap-2">
-                    <input type="text" id="host-id-display" class="bg-transparent text-slate-300 text-sm w-full outline-none mono font-bold" readonly>
-                    <button id="copy-id-btn" class="text-blue-400 hover:text-blue-300 text-xs font-bold uppercase">Copy ID</button>
-                </div>
+            <div class="bg-black/40 p-3 rounded-lg border border-white/10 flex items-center gap-2">
+                <input type="text" id="host-id-display" class="bg-transparent text-slate-300 text-xs w-full font-mono outline-none" readonly>
+                <button id="copy-id-btn" class="text-indigo-400 hover:text-indigo-300 text-[10px] font-bold uppercase tracking-wider">Copy</button>
             </div>
         </div>
+
+        <!-- Join Modal -->
+        <div id="join-content" class="glass-panel p-6 rounded-2xl w-full max-w-sm mx-4 transform scale-95 transition-transform duration-300 hidden">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="font-bold text-lg">Join Session</h3>
+                <button class="close-modal text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <input type="text" id="manual-host-id" class="w-full bg-black/40 border border-white/10 text-white p-4 rounded-xl outline-none focus:border-indigo-500/50 mb-4 font-mono text-sm placeholder-slate-600 transition-colors" placeholder="Paste Session ID...">
+            <button id="confirm-join-btn" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white py-3 rounded-xl font-bold transition shadow-lg shadow-indigo-600/20">Connect</button>
+        </div>
+
     </div>
 
-    <!-- Manual Join Modal -->
-    <div id="join-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-300">
-        <div class="bg-slate-800 p-6 rounded-xl border border-slate-600 shadow-2xl max-w-sm w-full mx-4 transform scale-95 transition-transform duration-300" id="join-content">
-            <div class="flex justify-between items-center mb-4">
-                <h3 class="text-white font-bold text-lg">Join Existing Session</h3>
-                <button id="close-join" class="text-slate-400 hover:text-white transition"><i class="fa-solid fa-xmark text-xl"></i></button>
-            </div>
-            
-            <p class="text-slate-400 text-xs mb-4">Paste the Session ID from the host device below.</p>
-
-            <input type="text" id="manual-host-id" class="w-full bg-slate-900 border border-slate-700 text-white p-3 rounded-md outline-none focus:border-blue-500 mb-4 mono text-sm" placeholder="Paste ID here...">
-            
-            <button id="confirm-join-btn" class="w-full bg-blue-600 hover:bg-blue-500 text-white py-2 rounded-md font-bold transition">Connect</button>
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-12 left-1/2 transform -translate-x-1/2 md:translate-x-0 md:left-auto md:right-6 bg-slate-800 border border-white/10 text-white px-4 py-3 rounded-xl shadow-2xl flex items-center gap-3 translate-y-20 opacity-0 transition-all duration-300 z-50 min-w-[300px]">
+        <div class="w-8 h-8 rounded-full bg-indigo-500/20 text-indigo-400 flex items-center justify-center shrink-0">
+            <i id="toast-icon" class="fa-solid fa-bell"></i>
+        </div>
+        <div>
+            <h4 id="toast-title" class="font-bold text-xs">Notification</h4>
+            <p id="toast-msg" class="text-xs text-slate-400">Message goes here</p>
         </div>
     </div>
 
     <script>
-        // --- Configuration & State ---
-        const textarea = document.getElementById('clipboard-area');
-        const statusText = document.getElementById('status-text');
-        const statusDot = document.getElementById('status-dot');
-        const peerCountLabel = document.getElementById('peer-count');
-        const shareBtn = document.getElementById('share-btn');
-        const joinBtn = document.getElementById('join-btn');
-        
-        // Modals
-        const qrModal = document.getElementById('qr-modal');
-        const qrContent = document.getElementById('qr-content');
-        const joinModal = document.getElementById('join-modal');
-        const joinContent = document.getElementById('join-content');
+        // --- UI & State Variables ---
+        const dom = {
+            text: document.getElementById('clipboard-area'),
+            statusText: document.getElementById('status-text'),
+            statusDot: document.getElementById('status-dot'),
+            peerCount: document.getElementById('peer-count'),
+            charCount: document.getElementById('char-count'),
+            lastSync: document.getElementById('last-sync'),
+            fileList: document.getElementById('file-list'),
+            dropZone: document.getElementById('drop-zone'),
+            fileInput: document.getElementById('file-input'),
+            emptyFiles: document.getElementById('empty-files'),
+            tabs: {
+                text: document.getElementById('tab-text'),
+                files: document.getElementById('tab-files'),
+                panelText: document.getElementById('panel-text'),
+                panelFiles: document.getElementById('panel-files')
+            },
+            modal: {
+                overlay: document.getElementById('modal-overlay'),
+                qr: document.getElementById('qr-content'),
+                join: document.getElementById('join-content')
+            }
+        };
 
-        // Inputs
-        const manualHostInput = document.getElementById('manual-host-id');
-        
-        // Get Host ID from URL if it exists
-        const urlParams = new URLSearchParams(window.location.search);
-        let hostIdFromUrl = urlParams.get('host');
-        let isHost = !hostIdFromUrl;
-
-        let peer = null;
-        let myId = null;
-        let connections = []; 
-        let isInternalUpdate = false; 
+        const state = {
+            peer: null,
+            myId: null,
+            conns: [],
+            isHost: false,
+            isInternalUpdate: false,
+            filesReceived: {} // Track received blobs
+        };
 
         // --- Initialization ---
+        
+        const urlParams = new URLSearchParams(window.location.search);
+        const hostIdParam = urlParams.get('host');
+        state.isHost = !hostIdParam;
 
         function init() {
-            // Initialize PeerJS
-            peer = new Peer(null, { debug: 1 });
+            state.peer = new Peer(null, { debug: 1 });
 
-            peer.on('open', (id) => {
-                myId = id;
-                console.log('My Peer ID: ' + id);
-
-                if (isHost) {
-                    setupHostUI();
+            state.peer.on('open', (id) => {
+                state.myId = id;
+                console.log('My ID:', id);
+                
+                if (state.isHost) {
+                    setStatus('active', 'Host Active');
+                    document.getElementById('share-btn').classList.remove('hidden');
+                    updateUrl(id);
                 } else {
-                    setupClientUI();
-                    connectToHost(hostIdFromUrl);
+                    setStatus('pending', 'Connecting...');
+                    document.getElementById('join-btn').classList.add('hidden');
+                    connectToHost(hostIdParam);
                 }
             });
 
-            peer.on('error', (err) => {
+            state.peer.on('connection', handleConnection);
+            
+            state.peer.on('error', (err) => {
                 console.error(err);
                 if(err.type === 'peer-unavailable') {
-                    alert("Host not found. Check the ID and try again.");
-                    setStatus('error', 'Host Not Found');
-                } else {
-                    setStatus('error', 'Connection Error');
+                    showToast('error', 'Connection Failed', 'Host not found or offline');
+                    setStatus('error', 'Host Offline');
                 }
             });
-            
-            textarea.focus();
+
+            // UI Listeners
+            setupUIListeners();
         }
 
-        // --- Host Logic ---
+        // --- Networking Logic ---
 
-        function setupHostUI() {
-            setStatus('ready', 'Ready (Host)');
-            shareBtn.classList.remove('hidden');
-            joinBtn.classList.remove('hidden'); // Allow switching to client mode manually
-            
-            // Listen for incoming connections
-            peer.on('connection', (conn) => {
-                handleConnection(conn);
-            });
+        function connectToHost(id) {
+            if(!id) return;
+            // Close existing
+            state.conns.forEach(c => c.close());
+            state.conns = [];
 
-            // Update URL cleanly without refreshing
-            const newUrl = window.location.protocol + "//" + window.location.host + window.location.pathname + '?host=' + myId;
-            window.history.replaceState({ path: newUrl }, '', newUrl);
+            const conn = state.peer.connect(id);
+            setupConnectionEvents(conn);
         }
 
         function handleConnection(conn) {
+            setupConnectionEvents(conn);
+        }
+
+        function setupConnectionEvents(conn) {
             conn.on('open', () => {
-                console.log("New connection from " + conn.peer);
-                connections.push(conn);
+                state.conns.push(conn);
                 updatePeerCount();
+                setStatus('active', 'Connected');
                 
-                // Send current state to new peer
-                conn.send({ type: 'sync', content: textarea.value });
+                if (state.isHost) {
+                    // Send initial state
+                    conn.send({ type: 'sync-text', content: dom.text.value });
+                } else {
+                    conn.send({ type: 'request-sync' });
+                    // Disable join button if successfully connected
+                    document.getElementById('join-btn').classList.add('hidden');
+                }
             });
 
-            conn.on('data', (data) => {
-                handleData(data, conn);
-            });
+            conn.on('data', (data) => handleData(data, conn));
 
             conn.on('close', () => {
-                connections = connections.filter(c => c !== conn);
+                state.conns = state.conns.filter(c => c !== conn);
                 updatePeerCount();
-            });
-        }
-
-        // --- Client Logic ---
-
-        function setupClientUI() {
-            setStatus('connecting', 'Connecting...');
-            shareBtn.classList.add('hidden'); // Clients cannot share connection (topology is star)
-            joinBtn.classList.add('hidden');
-        }
-
-        function connectToHost(hostId) {
-            if(!hostId) return;
-
-            // Close existing connections if any
-            connections.forEach(c => c.close());
-            connections = [];
-
-            const conn = peer.connect(hostId);
-            
-            conn.on('open', () => {
-                setStatus('connected', 'Connected');
-                connections.push(conn);
-                updatePeerCount();
-                // Request sync immediately
-                conn.send({ type: 'request-sync' });
-            });
-
-            conn.on('data', (data) => {
-                handleData(data, conn);
-            });
-
-            conn.on('close', () => {
-                setStatus('error', 'Disconnected');
-                connections = [];
-                updatePeerCount();
-                alert("Disconnected from Host.");
-            });
-        }
-
-        // --- Shared Logic ---
-
-        function handleData(data, sourceConn) {
-            if (data.type === 'sync' || data.type === 'update') {
-                if (textarea.value !== data.content) {
-                    isInternalUpdate = true;
-                    textarea.value = data.content;
-                    isInternalUpdate = false;
+                if (state.conns.length === 0 && !state.isHost) {
+                    setStatus('error', 'Disconnected');
+                    showToast('error', 'Disconnected', 'Lost connection to host');
                 }
+            });
+        }
+
+        function handleData(data, senderConn) {
+            switch(data.type) {
+                case 'sync-text':
+                    if (dom.text.value !== data.content) {
+                        state.isInternalUpdate = true;
+                        dom.text.value = data.content;
+                        updateTextStats();
+                        state.isInternalUpdate = false;
+                        highlightUpdate();
+                    }
+                    if (state.isHost) broadcast(data, senderConn);
+                    break;
                 
-                // Host rebroadcasts to others
-                if (isHost) {
-                    broadcastData(data.content, sourceConn);
-                }
-            } else if (data.type === 'request-sync' && isHost) {
-                 sourceConn.send({ type: 'sync', content: textarea.value });
+                case 'request-sync':
+                    if (state.isHost) senderConn.send({ type: 'sync-text', content: dom.text.value });
+                    break;
+
+                case 'file-meta':
+                    // Prepare to receive file
+                    addFileToUI(data.meta, 'receiving');
+                    break;
+
+                case 'file-chunk':
+                    // Receive actual file data
+                    handleReceivedFile(data.meta, data.blob);
+                    if (state.isHost) broadcast(data, senderConn); // Host relays files too
+                    break;
             }
         }
 
-        function broadcastData(content, excludeConn = null) {
-            connections.forEach(conn => {
-                if (conn !== excludeConn && conn.open) {
-                    conn.send({ type: 'update', content: content });
+        function broadcast(data, excludeConn) {
+            state.conns.forEach(c => {
+                if (c !== excludeConn && c.open) c.send(data);
+            });
+        }
+
+        // --- File Handling ---
+
+        function sendFile(file) {
+            const meta = {
+                id: crypto.randomUUID(),
+                name: file.name,
+                size: file.size,
+                type: file.type,
+                timestamp: Date.now()
+            };
+
+            // Add to own UI
+            addFileToUI(meta, 'sent');
+            showToast('info', 'Sending File...', file.name);
+
+            // Send Meta first
+            broadcast({ type: 'file-meta', meta: meta });
+
+            // Send Data (PeerJS handles binary blobs)
+            // Note: Large files might need chunking, keeping it simple for <10MB for stability in this demo
+            const blob = new Blob([file], { type: file.type });
+            broadcast({ type: 'file-chunk', meta: meta, blob: blob });
+        }
+
+        function handleReceivedFile(meta, blob) {
+            const receivedBlob = new Blob([blob], { type: meta.type });
+            const url = URL.createObjectURL(receivedBlob);
+            
+            updateFileUI(meta.id, url);
+            showToast('success', 'File Received', meta.name);
+        }
+
+        // --- UI Logic ---
+
+        function setupUIListeners() {
+            // Text Sync
+            dom.text.addEventListener('input', () => {
+                if(state.isInternalUpdate) return;
+                const content = dom.text.value;
+                updateTextStats();
+                
+                const msg = { type: 'sync-text', content: content };
+                if (state.isHost) broadcast(msg);
+                else state.conns.forEach(c => c.send(msg));
+            });
+
+            // Buttons
+            document.getElementById('copy-btn').addEventListener('click', () => {
+                navigator.clipboard.writeText(dom.text.value);
+                showToast('success', 'Copied', 'Text copied to clipboard');
+            });
+
+            document.getElementById('clear-btn').addEventListener('click', () => {
+                dom.text.value = '';
+                dom.text.dispatchEvent(new Event('input'));
+            });
+
+            // File Drag & Drop
+            dom.dropZone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                dom.dropZone.classList.add('drag-active');
+            });
+            dom.dropZone.addEventListener('dragleave', () => dom.dropZone.classList.remove('drag-active'));
+            dom.dropZone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                dom.dropZone.classList.remove('drag-active');
+                if (e.dataTransfer.files.length) sendFile(e.dataTransfer.files[0]);
+            });
+            dom.fileInput.addEventListener('change', (e) => {
+                if (e.target.files.length) sendFile(e.target.files[0]);
+            });
+
+            // Tabs (Mobile)
+            dom.tabs.text.addEventListener('click', () => switchTab('text'));
+            dom.tabs.files.addEventListener('click', () => switchTab('files'));
+
+            // Modals
+            document.getElementById('share-btn').addEventListener('click', openQR);
+            document.getElementById('join-btn').addEventListener('click', () => openModal('join'));
+            document.querySelectorAll('.close-modal').forEach(b => b.addEventListener('click', closeModal));
+            dom.modal.overlay.addEventListener('click', (e) => {
+                if (e.target === dom.modal.overlay) closeModal();
+            });
+
+            document.getElementById('confirm-join-btn').addEventListener('click', () => {
+                const id = document.getElementById('manual-host-id').value.trim();
+                if(id) {
+                    state.isHost = false;
+                    closeModal();
+                    connectToHost(id);
                 }
             });
         }
 
-        // --- UI Interactions ---
-
-        // Textarea Sync
-        textarea.addEventListener('input', () => {
-            if (isInternalUpdate) return;
-            const content = textarea.value;
-            
-            if (isHost) {
-                broadcastData(content);
+        function switchTab(tab) {
+            if (tab === 'text') {
+                dom.tabs.text.className = "px-3 py-1.5 rounded-md text-xs font-medium bg-white/10 text-white transition-all";
+                dom.tabs.files.className = "px-3 py-1.5 rounded-md text-xs font-medium text-slate-400 hover:text-white transition-all";
+                dom.tabs.panelText.classList.remove('-translate-x-full', 'opacity-0');
+                dom.tabs.panelFiles.classList.add('translate-x-full');
             } else {
-                connections.forEach(conn => conn.send({ type: 'update', content: content }));
+                dom.tabs.files.className = "px-3 py-1.5 rounded-md text-xs font-medium bg-white/10 text-white transition-all";
+                dom.tabs.text.className = "px-3 py-1.5 rounded-md text-xs font-medium text-slate-400 hover:text-white transition-all";
+                dom.tabs.panelText.classList.add('-translate-x-full', 'opacity-0');
+                dom.tabs.panelFiles.classList.remove('translate-x-full');
             }
-        });
-
-        // Copy Button
-        document.getElementById('copy-btn').addEventListener('click', async () => {
-            await navigator.clipboard.writeText(textarea.value);
-            showCopyOverlay();
-        });
-
-        function showCopyOverlay() {
-            const overlay = document.getElementById('copy-overlay');
-            overlay.classList.remove('opacity-0', 'pointer-events-none');
-            overlay.children[0].classList.remove('scale-95');
-            overlay.children[0].classList.add('scale-100');
-            
-            setTimeout(() => {
-                overlay.classList.add('opacity-0', 'pointer-events-none');
-                overlay.children[0].classList.add('scale-95');
-                overlay.children[0].classList.remove('scale-100');
-            }, 1500);
         }
 
-        // Clear Button
-        document.getElementById('clear-btn').addEventListener('click', () => {
-            textarea.value = '';
-            textarea.dispatchEvent(new Event('input'));
-            textarea.focus();
-        });
+        // --- Renderers ---
 
-        // --- Manual Join Logic ---
-        
-        joinBtn.addEventListener('click', () => {
-            openModal(joinModal, joinContent);
-            manualHostInput.focus();
-        });
-
-        document.getElementById('close-join').addEventListener('click', () => closeModal(joinModal, joinContent));
-        
-        document.getElementById('confirm-join-btn').addEventListener('click', () => {
-            const id = manualHostInput.value.trim();
-            if (id) {
-                closeModal(joinModal, joinContent);
-                isHost = false; // Switch mode
-                setupClientUI(); // Update UI
-                connectToHost(id);
-            }
-        });
-
-        // --- QR Modal Logic ---
-
-        shareBtn.addEventListener('click', () => {
-            const currentUrl = window.location.href;
+        function addFileToUI(meta, status) {
+            dom.emptyFiles.style.display = 'none';
             
-            // Generate QR
-            const qrContainer = document.getElementById('qrcode');
-            qrContainer.innerHTML = '';
-            new QRCode(qrContainer, {
-                text: currentUrl,
-                width: 160,
-                height: 160,
-                colorDark : "#0f172a",
-                colorLight : "#ffffff",
-                correctLevel : QRCode.CorrectLevel.M
+            const div = document.createElement('div');
+            div.id = `file-${meta.id}`;
+            div.className = "slide-up bg-white/5 border border-white/5 rounded-xl p-3 flex items-center gap-3 group hover:bg-white/10 transition-colors";
+            
+            const iconClass = meta.type.includes('image') ? 'fa-image text-purple-400' : 
+                              meta.type.includes('pdf') ? 'fa-file-pdf text-red-400' : 'fa-file text-blue-400';
+
+            div.innerHTML = `
+                <div class="w-10 h-10 rounded-lg bg-black/20 flex items-center justify-center shrink-0">
+                    <i class="fa-solid ${iconClass} text-lg"></i>
+                </div>
+                <div class="flex-1 min-w-0">
+                    <div class="flex justify-between items-start">
+                        <h4 class="text-sm font-medium truncate pr-2 text-slate-200">${meta.name}</h4>
+                        <span class="text-[10px] text-slate-500 font-mono shrink-0">${formatBytes(meta.size)}</span>
+                    </div>
+                    <div class="flex items-center justify-between mt-1">
+                        <span class="status-badge text-[10px] uppercase font-bold tracking-wider ${status === 'sent' ? 'text-emerald-400' : 'text-yellow-400'}">
+                            ${status === 'sent' ? 'Sent' : 'Receiving...'}
+                        </span>
+                        <a href="#" class="download-link hidden text-xs bg-white text-black px-2 py-1 rounded font-bold hover:bg-slate-200 transition">Download</a>
+                    </div>
+                </div>
+            `;
+            
+            dom.fileList.prepend(div);
+        }
+
+        function updateFileUI(id, url) {
+            const el = document.getElementById(`file-${id}`);
+            if (el) {
+                const badge = el.querySelector('.status-badge');
+                const link = el.querySelector('.download-link');
+                
+                badge.innerText = "Received";
+                badge.className = "status-badge text-[10px] uppercase font-bold tracking-wider text-emerald-400";
+                
+                link.href = url;
+                link.download = ""; // Use original name from logic if tracked, currently just reliable download
+                link.classList.remove('hidden');
+            }
+        }
+
+        function openQR() {
+            // Generate link manually
+            const baseUrl = window.location.href.split('?')[0];
+            const link = `${baseUrl}?host=${state.myId}`;
+            
+            document.getElementById('qrcode').innerHTML = "";
+            new QRCode(document.getElementById('qrcode'), {
+                text: link,
+                width: 180,
+                height: 180,
+                colorDark : "#000000",
+                colorLight : "#ffffff"
             });
+            document.getElementById('host-id-display').value = state.myId;
+            
+            // Copy ID Button
+            document.getElementById('copy-id-btn').onclick = () => {
+                document.getElementById('host-id-display').select();
+                document.execCommand('copy');
+                showToast('success', 'Copied', 'ID copied to clipboard');
+            };
 
-            document.getElementById('host-id-display').value = myId;
-            openModal(qrModal, qrContent);
-        });
-
-        document.getElementById('close-qr').addEventListener('click', () => closeModal(qrModal, qrContent));
-        
-        document.getElementById('copy-id-btn').addEventListener('click', () => {
-            const input = document.getElementById('host-id-display');
-            input.select();
-            document.execCommand('copy');
-            const btn = document.getElementById('copy-id-btn');
-            const originalText = btn.innerText;
-            btn.innerText = "COPIED";
-            setTimeout(() => btn.innerText = originalText, 2000);
-        });
-
-        // Universal Modal Helpers
-        function openModal(modal, content) {
-            modal.classList.remove('opacity-0', 'pointer-events-none');
-            content.classList.remove('scale-95');
-            content.classList.add('scale-100');
+            openModal('qr');
         }
 
-        function closeModal(modal, content) {
-            modal.classList.add('opacity-0', 'pointer-events-none');
-            content.classList.add('scale-95');
-            content.classList.remove('scale-100');
+        function openModal(type) {
+            dom.modal.overlay.classList.remove('opacity-0', 'pointer-events-none');
+            dom.modal[type].classList.remove('hidden');
+            setTimeout(() => {
+                dom.modal[type].classList.remove('scale-95');
+                dom.modal[type].classList.add('scale-100');
+            }, 10);
         }
 
-        window.addEventListener('click', (e) => {
-            if (e.target === qrModal) closeModal(qrModal, qrContent);
-            if (e.target === joinModal) closeModal(joinModal, joinContent);
-        });
+        function closeModal() {
+            dom.modal.overlay.classList.add('opacity-0', 'pointer-events-none');
+            Object.values(dom.modal).forEach(el => {
+                if(el !== dom.modal.overlay) {
+                    el.classList.add('scale-95');
+                    el.classList.remove('scale-100');
+                    setTimeout(() => el.classList.add('hidden'), 300);
+                }
+            });
+        }
 
-        // Helpers
+        function showToast(type, title, msg) {
+            const toast = document.getElementById('toast');
+            const icon = document.getElementById('toast-icon');
+            const titleEl = document.getElementById('toast-title');
+            const msgEl = document.getElementById('toast-msg');
+
+            icon.className = type === 'success' ? 'fa-solid fa-check text-emerald-400' : 
+                             type === 'error' ? 'fa-solid fa-triangle-exclamation text-red-400' : 'fa-solid fa-bell text-indigo-400';
+            
+            titleEl.innerText = title;
+            msgEl.innerText = msg;
+
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            setTimeout(() => toast.classList.add('translate-y-20', 'opacity-0'), 3000);
+        }
+
+        // --- Helpers ---
+
         function setStatus(type, msg) {
-            statusText.innerText = msg;
-            statusDot.className = "w-2 h-2 rounded-full " + 
-                (type === 'ready' ? 'bg-green-500' : 
-                 type === 'connected' ? 'bg-blue-500' : 
-                 type === 'error' ? 'bg-red-500' : 'bg-yellow-500 animate-pulse');
+            dom.statusText.innerText = msg;
+            dom.statusDot.className = `w-1.5 h-1.5 rounded-full ${
+                type === 'active' ? 'bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.5)]' :
+                type === 'error' ? 'bg-red-500' : 'bg-yellow-500 animate-pulse'
+            }`;
         }
 
         function updatePeerCount() {
-            const count = connections.length + 1;
-            peerCountLabel.innerHTML = `<i class="fa-solid fa-users"></i> ${count} Device${count !== 1 ? 's' : ''}`;
+            const count = state.conns.length + 1;
+            dom.peerCount.innerHTML = `<i class="fa-solid fa-user-group mr-1"></i> ${count} Device${count !== 1 ? 's' : ''}`;
         }
 
-        // --- Start ---
-        init();
+        function updateTextStats() {
+            const len = dom.text.value.length;
+            dom.charCount.innerText = `${len} char${len !== 1 ? 's' : ''}`;
+        }
 
+        function highlightUpdate() {
+            dom.lastSync.innerText = "Synced: Just now";
+            dom.lastSync.classList.add('text-emerald-400');
+            setTimeout(() => dom.lastSync.classList.remove('text-emerald-400'), 1000);
+        }
+
+        function updateUrl(id) {
+            try {
+                const newUrl = window.location.protocol + "//" + window.location.host + window.location.pathname + '?host=' + id;
+                window.history.replaceState({ path: newUrl }, '', newUrl);
+            } catch(e) {}
+        }
+
+        function formatBytes(bytes, decimals = 2) {
+            if (!+bytes) return '0 Bytes';
+            const k = 1024;
+            const dm = decimals < 0 ? 0 : decimals;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`;
+        }
+
+        init();
     </script>
 </body>
 </html>
