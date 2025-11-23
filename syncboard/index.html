@@ -767,6 +767,8 @@
                 if(id) {
                     state.isHost = false;
                     closeModal();
+                    // FIX: Update URL immediately when joining manually
+                    updateUrl(id);
                     connectToHost(id);
                 }
             });
