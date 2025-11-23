@@ -30,7 +30,6 @@
             font-family: 'Outfit', sans-serif;
             background-color: #000;
             color: #fff;
-            /* Use dvh for mobile browsers to account for address bars */
             height: 100dvh; 
             width: 100vw;
             overflow: hidden;
@@ -115,6 +114,25 @@
                 height: 100%;
             }
         }
+        
+        /* How It Works Diagram */
+        .diagram-connector {
+            flex: 1;
+            height: 2px;
+            background: linear-gradient(90deg, rgba(255,255,255,0.1) 0%, #6366f1 50%, rgba(255,255,255,0.1) 100%);
+            position: relative;
+        }
+        .diagram-connector::after {
+            content: '';
+            position: absolute;
+            top: -4px;
+            left: 50%;
+            width: 10px;
+            height: 10px;
+            background: #6366f1;
+            border-radius: 50%;
+            box-shadow: 0 0 10px #6366f1;
+        }
     </style>
 </head>
 <body class="flex flex-col relative">
@@ -136,12 +154,19 @@
             </div>
         </div>
 
-        <div class="flex items-center gap-2">
+        <div class="flex items-center gap-3">
+            <!-- Info Button -->
+            <button id="info-btn" class="w-8 h-8 rounded-full hover:bg-white/10 flex items-center justify-center transition text-slate-400 hover:text-indigo-400" title="How it Works">
+                <i class="fa-regular fa-circle-question text-lg"></i>
+            </button>
+
             <!-- Mobile Tabs Toggle -->
-            <div class="flex md:hidden bg-white/5 rounded-lg p-1 border border-white/5 mr-1">
+            <div class="flex md:hidden bg-white/5 rounded-lg p-1 border border-white/5">
                 <button id="tab-text" class="px-3 py-1.5 rounded-md text-xs font-medium bg-white/10 text-white transition-all shadow-sm">Text</button>
                 <button id="tab-files" class="px-3 py-1.5 rounded-md text-xs font-medium text-slate-400 hover:text-white transition-all">Files</button>
             </div>
+
+            <div class="h-6 w-px bg-white/10 hidden md:block"></div>
 
             <button id="join-btn" class="glass-button text-slate-300 px-3 py-2 rounded-lg text-xs font-semibold flex items-center gap-2">
                 <i class="fa-solid fa-link"></i> <span class="hidden sm:inline">Join</span>
@@ -270,6 +295,87 @@
             </div>
         </div>
 
+        <!-- Info/How-it-works Modal -->
+        <div id="info-content" class="glass-panel p-0 rounded-2xl w-full max-w-lg transform scale-95 transition-transform duration-300 hidden overflow-hidden flex flex-col max-h-[85vh]">
+            <div class="p-4 border-b border-white/5 flex justify-between items-center bg-black/20 shrink-0">
+                <h3 class="font-bold text-lg flex items-center gap-2">
+                    <i class="fa-solid fa-microchip text-indigo-400"></i> Under the Hood
+                </h3>
+                <button class="close-modal text-slate-400 hover:text-white p-2"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            
+            <div class="overflow-y-auto p-6 space-y-8">
+                
+                <!-- Concept -->
+                <div class="text-center">
+                    <div class="flex items-center justify-center gap-4 mb-4 text-2xl">
+                        <div class="flex flex-col items-center gap-1">
+                            <i class="fa-solid fa-mobile-screen text-slate-300"></i>
+                            <span class="text-[10px] text-slate-500 font-mono">YOU</span>
+                        </div>
+                        <div class="diagram-connector w-16"></div>
+                        <div class="flex flex-col items-center gap-1">
+                            <i class="fa-solid fa-laptop text-slate-300"></i>
+                            <span class="text-[10px] text-slate-500 font-mono">PEER</span>
+                        </div>
+                    </div>
+                    <h4 class="font-bold text-white mb-1">Peer-to-Peer (P2P)</h4>
+                    <p class="text-sm text-slate-400 leading-relaxed">
+                        Devices connect directly to each other like walkie-talkies. 
+                        No central server stores your data.
+                    </p>
+                </div>
+
+                <!-- Features Grid -->
+                <div class="grid gap-4">
+                    <div class="bg-white/5 p-4 rounded-xl border border-white/5 flex gap-4">
+                        <div class="w-10 h-10 rounded-lg bg-emerald-500/20 flex items-center justify-center shrink-0 text-emerald-400">
+                            <i class="fa-solid fa-lock"></i>
+                        </div>
+                        <div>
+                            <h5 class="font-bold text-sm text-white">End-to-End Encryption</h5>
+                            <p class="text-xs text-slate-400 mt-1">
+                                Data is encrypted using WebRTC (DTLS/SRTP). Even if intercepted, your text and files look like gibberish to outsiders.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="bg-white/5 p-4 rounded-xl border border-white/5 flex gap-4">
+                        <div class="w-10 h-10 rounded-lg bg-blue-500/20 flex items-center justify-center shrink-0 text-blue-400">
+                            <i class="fa-solid fa-database"></i>
+                        </div>
+                        <div>
+                            <h5 class="font-bold text-sm text-white">No Database</h5>
+                            <p class="text-xs text-slate-400 mt-1">
+                                We don't have a database. Your data exists only in your device's RAM. Close the tab, and it's gone forever.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="bg-white/5 p-4 rounded-xl border border-white/5 flex gap-4">
+                        <div class="w-10 h-10 rounded-lg bg-yellow-500/20 flex items-center justify-center shrink-0 text-yellow-400">
+                            <i class="fa-solid fa-door-open"></i>
+                        </div>
+                        <div>
+                            <h5 class="font-bold text-sm text-white">Strict Access Control</h5>
+                            <p class="text-xs text-slate-400 mt-1">
+                                The "Knock" system ensures no one enters your session without your explicit approval.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-center pt-4 border-t border-white/5">
+                    <p class="text-xs text-slate-500">
+                        Built transparently with <i class="fa-brands fa-html5 text-orange-500"></i> HTML5 & WebRTC.
+                        <br>
+                        Right-click > View Source to verify.
+                    </p>
+                </div>
+
+            </div>
+        </div>
+
     </div>
 
     <!-- Toast -->
@@ -306,7 +412,8 @@
                 overlay: document.getElementById('modal-overlay'),
                 qr: document.getElementById('qr-content'),
                 join: document.getElementById('join-content'),
-                knock: document.getElementById('knock-content')
+                knock: document.getElementById('knock-content'),
+                info: document.getElementById('info-content')
             }
         };
 
@@ -317,7 +424,8 @@
             pendingKnocks: new Map(), // Connections waiting for approval
             isHost: false,
             isInternalUpdate: false,
-            approvedPeers: new Set()
+            approvedPeers: new Set(),
+            knockInterval: null
         };
 
         // --- Helper: Identify Device ---
@@ -359,7 +467,12 @@
             });
 
             state.peer.on('connection', (conn) => {
-                if(state.isHost) handleIncomingConnection(conn);
+                if(state.isHost) {
+                    handleIncomingConnection(conn);
+                } else {
+                    // Clients reject incoming connections unless they are strictly P2P mesh (not implemented here)
+                    // conn.close(); 
+                }
             });
             
             state.peer.on('error', (err) => {
@@ -377,62 +490,81 @@
             if(!id) return;
             state.conns.forEach(c => c.close());
             state.conns = [];
+            clearInterval(state.knockInterval);
 
             const conn = state.peer.connect(id);
             
             conn.on('open', () => {
                 setStatus('pending', 'Waiting for approval...');
-                // Send Knock with Device Info
-                conn.send({ 
-                    type: 'knock', 
-                    device: getDeviceInfo() 
-                });
+                
+                // --- ROBUST KNOCK LOGIC ---
+                // Send knock immediately after a tiny delay to ensure stability
+                setTimeout(() => sendKnock(conn), 500);
+
+                // Retry knocking every 2 seconds until accepted
+                state.knockInterval = setInterval(() => {
+                   if(conn.open) sendKnock(conn);
+                }, 2000);
             });
 
             conn.on('data', (data) => {
                 if(data.type === 'welcome') {
                     // Approved!
+                    clearInterval(state.knockInterval);
                     state.conns.push(conn);
                     updatePeerCount();
                     setStatus('active', 'Connected');
                     // Request initial sync
                     conn.send({ type: 'request-sync' });
                 } else if(data.type === 'reject') {
+                    clearInterval(state.knockInterval);
                     conn.close();
                     setStatus('error', 'Access Denied');
                     showToast('error', 'Denied', 'Host rejected connection');
-                    setTimeout(() => { window.location.href = window.location.pathname; }, 2000);
                 } else {
                     handleData(data, conn);
                 }
             });
 
             conn.on('close', () => {
+                clearInterval(state.knockInterval);
                 state.conns = state.conns.filter(c => c !== conn);
                 updatePeerCount();
                 if(state.conns.length === 0) setStatus('error', 'Disconnected');
             });
         }
 
+        function sendKnock(conn) {
+            console.log("Sending knock...");
+            conn.send({ 
+                type: 'knock', 
+                device: getDeviceInfo() 
+            });
+        }
+
         // --- Host Side: Handle Knocks ---
         function handleIncomingConnection(conn) {
+            // Ensure we listen for data immediately
             conn.on('data', (data) => {
+                // If this is a knock
                 if(data.type === 'knock') {
-                    // Received a knock
                     if(state.approvedPeers.has(conn.peer)) {
-                        // Already approved (reconnection), welcome back immediately
+                        // Already approved (reconnection)
                         acceptConnection(conn);
                     } else {
-                        // New user, trigger modal
-                        state.pendingKnocks.set(conn.peer, conn);
-                        showKnockModal(data.device, conn.peer);
+                        // Check if we already have a pending modal for this peer to avoid duplicates
+                        if(!state.pendingKnocks.has(conn.peer)) {
+                            state.pendingKnocks.set(conn.peer, conn);
+                            showKnockModal(data.device, conn.peer);
+                        }
                     }
                 } else {
-                    // Verify connection is approved before processing data
+                    // --- SECURITY CHECK ---
+                    // Only process data if peer is approved
                     if(state.approvedPeers.has(conn.peer)) {
                         handleData(data, conn);
                     } else {
-                        console.warn("Data received from unapproved peer", conn.peer);
+                        console.warn("Blocked data from unapproved peer:", conn.peer);
                     }
                 }
             });
@@ -459,7 +591,7 @@
 
             newDeny.addEventListener('click', () => {
                 const conn = state.pendingKnocks.get(peerId);
-                if(conn) {
+                if(conn && conn.open) {
                     conn.send({ type: 'reject' });
                     setTimeout(() => conn.close(), 100);
                 }
@@ -481,10 +613,18 @@
 
         function acceptConnection(conn) {
             state.approvedPeers.add(conn.peer);
-            state.conns.push(conn);
-            conn.send({ type: 'welcome' });
-            // Send current state immediately
-            conn.send({ type: 'sync-text', content: dom.text.value });
+            
+            // Avoid duplicate connections in array
+            if(!state.conns.find(c => c.peer === conn.peer)) {
+                state.conns.push(conn);
+            }
+            
+            if(conn.open) {
+                conn.send({ type: 'welcome' });
+                // Send current state immediately
+                conn.send({ type: 'sync-text', content: dom.text.value });
+            }
+            
             updatePeerCount();
             showToast('success', 'Device Connected', 'Sync active');
         }
@@ -520,7 +660,15 @@
 
         function broadcast(data, excludeConn) {
             state.conns.forEach(c => {
-                if (c !== excludeConn && c.open) c.send(data);
+                // --- SECURITY CHECK ---
+                // Ensure we only broadcast to approved peers and open connections
+                // Host relies on state.conns which is populated only after approval
+                // But we add an extra safety check on the peer ID if possible, 
+                // though state.conns implies approval in this architecture.
+                
+                if (c !== excludeConn && c.open) {
+                     c.send(data);
+                }
             });
         }
 
@@ -586,6 +734,7 @@
 
             // Modals
             document.getElementById('share-btn').addEventListener('click', openQR);
+            document.getElementById('info-btn').addEventListener('click', () => openModal('info'));
             document.getElementById('join-btn').addEventListener('click', () => openModal('join'));
             document.querySelectorAll('.close-modal').forEach(b => b.addEventListener('click', closeModal));
             dom.modal.overlay.addEventListener('click', (e) => {
