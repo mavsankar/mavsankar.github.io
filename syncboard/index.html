@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>SyncBoard | P2P Ecosystem</title>
     
     <!-- Tailwind CSS -->
@@ -24,14 +24,16 @@
         :root {
             --glass-border: rgba(255, 255, 255, 0.08);
             --glass-bg: rgba(17, 24, 39, 0.7);
-            --accent-gradient: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
         }
 
         body {
             font-family: 'Outfit', sans-serif;
             background-color: #000;
             color: #fff;
-            overflow: hidden; /* Prevent body scroll, handle inside containers */
+            /* Use dvh for mobile browsers to account for address bars */
+            height: 100dvh; 
+            width: 100vw;
+            overflow: hidden;
         }
 
         .font-mono { font-family: 'JetBrains Mono', monospace; }
@@ -43,6 +45,7 @@
             background: radial-gradient(circle at 15% 50%, rgba(76, 29, 149, 0.4), transparent 25%),
                         radial-gradient(circle at 85% 30%, rgba(37, 99, 235, 0.4), transparent 25%);
             z-index: -1;
+            pointer-events: none;
         }
 
         /* Glassmorphism Utilities */
@@ -77,34 +80,55 @@
             transform: scale(1.02);
         }
 
-        /* Animations */
-        @keyframes float {
-            0% { transform: translateY(0px); }
-            50% { transform: translateY(-10px); }
-            100% { transform: translateY(0px); }
+        /* Mobile Tab Transition */
+        .mobile-panel {
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            position: absolute;
+            inset: 0;
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
         }
-        .animate-float { animation: float 6s ease-in-out infinite; }
+        
+        .panel-hidden {
+            opacity: 0;
+            pointer-events: none;
+            z-index: 0;
+            transform: translateX(20px);
+        }
+        
+        .panel-active {
+            opacity: 1;
+            pointer-events: auto;
+            z-index: 10;
+            transform: translateX(0);
+        }
 
-        .slide-up { animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+        /* On Desktop, reset mobile styles */
+        @media (min-width: 768px) {
+            .mobile-panel {
+                position: relative;
+                opacity: 1 !important;
+                pointer-events: auto !important;
+                transform: none !important;
+                inset: auto;
+                height: 100%;
+            }
         }
     </style>
 </head>
-<body class="h-screen flex flex-col relative">
+<body class="flex flex-col relative">
 
-    <!-- Dynamic Background -->
     <div class="bg-gradient-mesh"></div>
 
     <!-- Navbar -->
-    <nav class="h-16 border-b border-white/5 bg-black/20 backdrop-blur-md flex items-center justify-between px-4 z-20 shrink-0">
+    <nav class="h-14 md:h-16 border-b border-white/5 bg-black/20 backdrop-blur-md flex items-center justify-between px-4 z-30 shrink-0">
         <div class="flex items-center gap-3">
             <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-purple-500/20">
                 <i class="fa-solid fa-infinity text-white text-sm"></i>
             </div>
             <div>
-                <h1 class="font-bold text-lg leading-none tracking-tight">SyncBoard</h1>
+                <h1 class="font-bold text-base md:text-lg leading-none tracking-tight">SyncBoard</h1>
                 <div class="flex items-center gap-2 mt-0.5">
                     <div id="status-dot" class="w-1.5 h-1.5 rounded-full bg-yellow-500 animate-pulse"></div>
                     <span id="status-text" class="text-[10px] font-medium text-slate-400 uppercase tracking-wider">Initializing...</span>
@@ -113,45 +137,45 @@
         </div>
 
         <div class="flex items-center gap-2">
-            <!-- Mobile Tabs Toggle (Hidden on Desktop) -->
-            <div class="flex md:hidden bg-white/5 rounded-lg p-1 border border-white/5 mr-2">
-                <button id="tab-text" class="px-3 py-1.5 rounded-md text-xs font-medium bg-white/10 text-white transition-all">Text</button>
+            <!-- Mobile Tabs Toggle -->
+            <div class="flex md:hidden bg-white/5 rounded-lg p-1 border border-white/5 mr-1">
+                <button id="tab-text" class="px-3 py-1.5 rounded-md text-xs font-medium bg-white/10 text-white transition-all shadow-sm">Text</button>
                 <button id="tab-files" class="px-3 py-1.5 rounded-md text-xs font-medium text-slate-400 hover:text-white transition-all">Files</button>
             </div>
 
             <button id="join-btn" class="glass-button text-slate-300 px-3 py-2 rounded-lg text-xs font-semibold flex items-center gap-2">
                 <i class="fa-solid fa-link"></i> <span class="hidden sm:inline">Join</span>
             </button>
-            <button id="share-btn" class="hidden bg-white text-black hover:bg-slate-200 px-4 py-2 rounded-lg text-xs font-bold transition shadow-lg shadow-white/10 flex items-center gap-2">
+            <button id="share-btn" class="hidden bg-white text-black hover:bg-slate-200 px-3 py-2 rounded-lg text-xs font-bold transition shadow-lg shadow-white/10 flex items-center gap-2">
                 <i class="fa-solid fa-qrcode"></i> <span class="hidden sm:inline">Connect</span>
             </button>
         </div>
     </nav>
 
     <!-- Main Workspace -->
-    <main class="flex-1 flex overflow-hidden relative z-10">
+    <main class="flex-1 flex overflow-hidden relative z-10 w-full max-w-[1600px] mx-auto">
         
         <!-- Left Panel: Text Editor -->
-        <section id="panel-text" class="flex-1 flex flex-col p-4 md:p-6 transition-all duration-300 absolute inset-0 md:relative md:translate-x-0 z-10 bg-black/0">
-            <div class="glass-panel flex-1 rounded-2xl flex flex-col overflow-hidden shadow-2xl relative group">
+        <section id="panel-text" class="mobile-panel panel-active w-full md:w-1/2 md:p-6 bg-transparent">
+            <div class="glass-panel flex-1 rounded-2xl flex flex-col overflow-hidden shadow-2xl relative group h-full">
                 <!-- Toolbar -->
-                <div class="h-10 border-b border-white/5 flex items-center justify-between px-4 bg-white/[0.02]">
+                <div class="h-10 border-b border-white/5 flex items-center justify-between px-4 bg-white/[0.02] shrink-0">
                     <span class="text-xs font-mono text-slate-500">PLAIN TEXT</span>
                     <div class="flex gap-2">
-                        <button id="clear-btn" class="text-slate-500 hover:text-red-400 transition text-xs" title="Clear"><i class="fa-solid fa-trash"></i></button>
-                        <button id="copy-btn" class="text-slate-500 hover:text-indigo-400 transition text-xs" title="Copy"><i class="fa-solid fa-copy"></i></button>
+                        <button id="clear-btn" class="text-slate-500 hover:text-red-400 transition text-xs p-2" title="Clear"><i class="fa-solid fa-trash"></i></button>
+                        <button id="copy-btn" class="text-slate-500 hover:text-indigo-400 transition text-xs p-2" title="Copy"><i class="fa-solid fa-copy"></i></button>
                     </div>
                 </div>
                 
                 <textarea 
                     id="clipboard-area" 
-                    class="flex-1 bg-transparent text-slate-200 p-6 text-base md:text-lg resize-none outline-none font-mono leading-relaxed placeholder-slate-700"
-                    placeholder="Type or paste text here to sync..."
+                    class="flex-1 bg-transparent text-slate-200 p-4 md:p-6 text-base md:text-lg resize-none outline-none font-mono leading-relaxed placeholder-slate-700 w-full"
+                    placeholder="Type here to sync..."
                     spellcheck="false"
                 ></textarea>
 
                 <!-- Status Footer -->
-                <div class="h-8 border-t border-white/5 flex items-center px-4 bg-black/20 text-[10px] text-slate-500 font-mono justify-between">
+                <div class="h-8 border-t border-white/5 flex items-center px-4 bg-black/20 text-[10px] text-slate-500 font-mono justify-between shrink-0">
                     <span id="char-count">0 chars</span>
                     <span id="last-sync">Synced: Never</span>
                 </div>
@@ -159,33 +183,31 @@
         </section>
 
         <!-- Right Panel: File Transfer -->
-        <section id="panel-files" class="flex-1 flex flex-col p-4 md:p-6 transition-all duration-300 absolute inset-0 translate-x-full md:relative md:translate-x-0 z-10 bg-black/0 md:border-l md:border-white/5">
+        <section id="panel-files" class="mobile-panel panel-hidden w-full md:w-1/2 md:p-6 bg-transparent md:border-l md:border-white/5">
             <div class="h-full flex flex-col gap-4">
                 
                 <!-- Drop Zone -->
-                <div id="drop-zone" class="h-48 glass-panel rounded-2xl border-dashed border-2 border-white/10 flex flex-col items-center justify-center text-center cursor-pointer hover:border-indigo-500/50 hover:bg-indigo-500/5 transition-all group relative overflow-hidden">
+                <div id="drop-zone" class="h-32 md:h-48 glass-panel rounded-2xl border-dashed border-2 border-white/10 flex flex-col items-center justify-center text-center cursor-pointer hover:border-indigo-500/50 hover:bg-indigo-500/5 transition-all group relative overflow-hidden shrink-0">
                     <input type="file" id="file-input" class="absolute inset-0 opacity-0 cursor-pointer z-20">
                     <div class="z-10 pointer-events-none transform group-hover:scale-110 transition-transform duration-300">
-                        <div class="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center mx-auto mb-3 border border-white/10 group-hover:border-indigo-500/50">
-                            <i class="fa-solid fa-cloud-arrow-up text-slate-400 group-hover:text-indigo-400 text-xl"></i>
+                        <div class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-white/5 flex items-center justify-center mx-auto mb-2 md:mb-3 border border-white/10 group-hover:border-indigo-500/50">
+                            <i class="fa-solid fa-cloud-arrow-up text-slate-400 group-hover:text-indigo-400 text-lg md:text-xl"></i>
                         </div>
-                        <h3 class="text-sm font-semibold text-slate-200">Drop files to send</h3>
-                        <p class="text-xs text-slate-500 mt-1">or click to browse</p>
+                        <h3 class="text-sm font-semibold text-slate-200">Drop files or click</h3>
                     </div>
                 </div>
 
                 <!-- File List -->
-                <div class="flex-1 glass-panel rounded-2xl flex flex-col overflow-hidden">
-                    <div class="h-10 border-b border-white/5 flex items-center px-4 bg-white/[0.02]">
-                        <span class="text-xs font-mono text-slate-500">TRANSFER HISTORY</span>
+                <div class="flex-1 glass-panel rounded-2xl flex flex-col overflow-hidden min-h-0">
+                    <div class="h-10 border-b border-white/5 flex items-center px-4 bg-white/[0.02] shrink-0">
+                        <span class="text-xs font-mono text-slate-500">HISTORY</span>
                     </div>
                     <div id="file-list" class="flex-1 overflow-y-auto p-2 space-y-2">
                         <!-- Empty State -->
                         <div id="empty-files" class="h-full flex flex-col items-center justify-center text-slate-600 opacity-50">
                             <i class="fa-solid fa-box-open text-2xl mb-2"></i>
-                            <span class="text-xs">No files shared yet</span>
+                            <span class="text-xs">No files yet</span>
                         </div>
-                        <!-- File items will be injected here -->
                     </div>
                 </div>
 
@@ -195,47 +217,62 @@
     </main>
 
     <!-- Footer Stats -->
-    <footer class="h-8 bg-black/40 border-t border-white/5 flex items-center justify-between px-4 text-[10px] text-slate-500 shrink-0 relative z-20">
+    <footer class="h-8 bg-black/40 border-t border-white/5 flex items-center justify-between px-4 text-[10px] text-slate-500 shrink-0 z-20 safe-area-bottom">
         <div class="flex items-center gap-2">
             <i class="fa-solid fa-shield-halved text-emerald-500/80"></i>
-            <span>End-to-End Encrypted via WebRTC</span>
+            <span class="hidden xs:inline">End-to-End Encrypted</span>
+            <span class="xs:hidden">E2EE</span>
         </div>
         <div id="peer-count">
-            <i class="fa-solid fa-user-group mr-1"></i> 1 Device
+            <i class="fa-solid fa-user-group mr-1"></i> 1
         </div>
     </footer>
 
-    <!-- Modals (QR & Join) -->
-    <div id="modal-overlay" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-300 flex items-center justify-center">
+    <!-- OVERLAYS -->
+    <div id="modal-overlay" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-300 flex items-center justify-center p-4">
         
         <!-- QR Modal -->
-        <div id="qr-content" class="glass-panel p-6 rounded-2xl w-full max-w-sm mx-4 transform scale-95 transition-transform duration-300 hidden">
+        <div id="qr-content" class="glass-panel p-6 rounded-2xl w-full max-w-sm transform scale-95 transition-transform duration-300 hidden">
             <div class="flex justify-between items-center mb-6">
                 <h3 class="font-bold text-lg">Connect Device</h3>
-                <button class="close-modal text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+                <button class="close-modal text-slate-400 hover:text-white p-2"><i class="fa-solid fa-xmark"></i></button>
             </div>
             <div class="bg-white p-4 rounded-xl flex justify-center mb-6">
                 <div id="qrcode"></div>
             </div>
             <div class="bg-black/40 p-3 rounded-lg border border-white/10 flex items-center gap-2">
                 <input type="text" id="host-id-display" class="bg-transparent text-slate-300 text-xs w-full font-mono outline-none" readonly>
-                <button id="copy-id-btn" class="text-indigo-400 hover:text-indigo-300 text-[10px] font-bold uppercase tracking-wider">Copy</button>
+                <button id="copy-id-btn" class="text-indigo-400 hover:text-indigo-300 text-[10px] font-bold uppercase tracking-wider p-2">Copy</button>
             </div>
         </div>
 
         <!-- Join Modal -->
-        <div id="join-content" class="glass-panel p-6 rounded-2xl w-full max-w-sm mx-4 transform scale-95 transition-transform duration-300 hidden">
+        <div id="join-content" class="glass-panel p-6 rounded-2xl w-full max-w-sm transform scale-95 transition-transform duration-300 hidden">
             <div class="flex justify-between items-center mb-6">
                 <h3 class="font-bold text-lg">Join Session</h3>
-                <button class="close-modal text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+                <button class="close-modal text-slate-400 hover:text-white p-2"><i class="fa-solid fa-xmark"></i></button>
             </div>
             <input type="text" id="manual-host-id" class="w-full bg-black/40 border border-white/10 text-white p-4 rounded-xl outline-none focus:border-indigo-500/50 mb-4 font-mono text-sm placeholder-slate-600 transition-colors" placeholder="Paste Session ID...">
             <button id="confirm-join-btn" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white py-3 rounded-xl font-bold transition shadow-lg shadow-indigo-600/20">Connect</button>
         </div>
 
+        <!-- Knock Approval Modal -->
+        <div id="knock-content" class="glass-panel p-6 rounded-2xl w-full max-w-sm transform scale-95 transition-transform duration-300 hidden border-indigo-500/30 shadow-indigo-500/10 shadow-2xl">
+            <div class="w-12 h-12 rounded-full bg-indigo-500/20 flex items-center justify-center mb-4 text-indigo-400 text-xl mx-auto">
+                <i class="fa-solid fa-user-shield"></i>
+            </div>
+            <h3 class="font-bold text-lg text-center mb-1">Access Request</h3>
+            <p id="knock-msg" class="text-xs text-slate-400 text-center mb-6">A device wants to join this session.</p>
+            
+            <div class="grid grid-cols-2 gap-3">
+                <button id="deny-knock-btn" class="bg-red-500/10 hover:bg-red-500/20 text-red-400 py-3 rounded-xl font-bold text-sm transition border border-red-500/20">Deny</button>
+                <button id="allow-knock-btn" class="bg-emerald-500 hover:bg-emerald-400 text-black py-3 rounded-xl font-bold text-sm transition shadow-lg shadow-emerald-500/20">Allow</button>
+            </div>
+        </div>
+
     </div>
 
-    <!-- Toast Notification -->
+    <!-- Toast -->
     <div id="toast" class="fixed bottom-12 left-1/2 transform -translate-x-1/2 md:translate-x-0 md:left-auto md:right-6 bg-slate-800 border border-white/10 text-white px-4 py-3 rounded-xl shadow-2xl flex items-center gap-3 translate-y-20 opacity-0 transition-all duration-300 z-50 min-w-[300px]">
         <div class="w-8 h-8 rounded-full bg-indigo-500/20 text-indigo-400 flex items-center justify-center shrink-0">
             <i id="toast-icon" class="fa-solid fa-bell"></i>
@@ -268,21 +305,37 @@
             modal: {
                 overlay: document.getElementById('modal-overlay'),
                 qr: document.getElementById('qr-content'),
-                join: document.getElementById('join-content')
+                join: document.getElementById('join-content'),
+                knock: document.getElementById('knock-content')
             }
         };
 
         const state = {
             peer: null,
             myId: null,
-            conns: [],
+            conns: [], // Active approved connections
+            pendingKnocks: new Map(), // Connections waiting for approval
             isHost: false,
             isInternalUpdate: false,
-            filesReceived: {} // Track received blobs
+            approvedPeers: new Set()
         };
 
+        // --- Helper: Identify Device ---
+        function getDeviceInfo() {
+            const ua = navigator.userAgent;
+            let os = "Unknown Device";
+            if (ua.indexOf("Win") !== -1) os = "Windows PC";
+            if (ua.indexOf("Mac") !== -1) os = "Mac";
+            if (ua.indexOf("Linux") !== -1) os = "Linux PC";
+            if (ua.indexOf("Android") !== -1) os = "Android";
+            if (ua.indexOf("like Mac") !== -1) os = "iPhone/iPad";
+            
+            // Add a random 4-digit ID to distinguish similar devices
+            const id = Math.floor(1000 + Math.random() * 9000);
+            return `${os} #${id}`;
+        }
+
         // --- Initialization ---
-        
         const urlParams = new URLSearchParams(window.location.search);
         const hostIdParam = urlParams.get('host');
         state.isHost = !hostIdParam;
@@ -299,70 +352,144 @@
                     document.getElementById('share-btn').classList.remove('hidden');
                     updateUrl(id);
                 } else {
-                    setStatus('pending', 'Connecting...');
+                    setStatus('pending', 'Knocking...');
                     document.getElementById('join-btn').classList.add('hidden');
                     connectToHost(hostIdParam);
                 }
             });
 
-            state.peer.on('connection', handleConnection);
+            state.peer.on('connection', (conn) => {
+                if(state.isHost) handleIncomingConnection(conn);
+            });
             
             state.peer.on('error', (err) => {
-                console.error(err);
                 if(err.type === 'peer-unavailable') {
-                    showToast('error', 'Connection Failed', 'Host not found or offline');
+                    showToast('error', 'Failed', 'Host not found');
                     setStatus('error', 'Host Offline');
                 }
             });
 
-            // UI Listeners
             setupUIListeners();
         }
 
-        // --- Networking Logic ---
-
+        // --- Client Side: Connect & Knock ---
         function connectToHost(id) {
             if(!id) return;
-            // Close existing
             state.conns.forEach(c => c.close());
             state.conns = [];
 
             const conn = state.peer.connect(id);
-            setupConnectionEvents(conn);
-        }
-
-        function handleConnection(conn) {
-            setupConnectionEvents(conn);
-        }
-
-        function setupConnectionEvents(conn) {
+            
             conn.on('open', () => {
-                state.conns.push(conn);
-                updatePeerCount();
-                setStatus('active', 'Connected');
-                
-                if (state.isHost) {
-                    // Send initial state
-                    conn.send({ type: 'sync-text', content: dom.text.value });
-                } else {
-                    conn.send({ type: 'request-sync' });
-                    // Disable join button if successfully connected
-                    document.getElementById('join-btn').classList.add('hidden');
-                }
+                setStatus('pending', 'Waiting for approval...');
+                // Send Knock with Device Info
+                conn.send({ 
+                    type: 'knock', 
+                    device: getDeviceInfo() 
+                });
             });
 
-            conn.on('data', (data) => handleData(data, conn));
+            conn.on('data', (data) => {
+                if(data.type === 'welcome') {
+                    // Approved!
+                    state.conns.push(conn);
+                    updatePeerCount();
+                    setStatus('active', 'Connected');
+                    // Request initial sync
+                    conn.send({ type: 'request-sync' });
+                } else if(data.type === 'reject') {
+                    conn.close();
+                    setStatus('error', 'Access Denied');
+                    showToast('error', 'Denied', 'Host rejected connection');
+                    setTimeout(() => { window.location.href = window.location.pathname; }, 2000);
+                } else {
+                    handleData(data, conn);
+                }
+            });
 
             conn.on('close', () => {
                 state.conns = state.conns.filter(c => c !== conn);
                 updatePeerCount();
-                if (state.conns.length === 0 && !state.isHost) {
-                    setStatus('error', 'Disconnected');
-                    showToast('error', 'Disconnected', 'Lost connection to host');
-                }
+                if(state.conns.length === 0) setStatus('error', 'Disconnected');
             });
         }
 
+        // --- Host Side: Handle Knocks ---
+        function handleIncomingConnection(conn) {
+            conn.on('data', (data) => {
+                if(data.type === 'knock') {
+                    // Received a knock
+                    if(state.approvedPeers.has(conn.peer)) {
+                        // Already approved (reconnection), welcome back immediately
+                        acceptConnection(conn);
+                    } else {
+                        // New user, trigger modal
+                        state.pendingKnocks.set(conn.peer, conn);
+                        showKnockModal(data.device, conn.peer);
+                    }
+                } else {
+                    // Verify connection is approved before processing data
+                    if(state.approvedPeers.has(conn.peer)) {
+                        handleData(data, conn);
+                    } else {
+                        console.warn("Data received from unapproved peer", conn.peer);
+                    }
+                }
+            });
+
+            conn.on('close', () => {
+                state.conns = state.conns.filter(c => c !== conn);
+                state.pendingKnocks.delete(conn.peer);
+                updatePeerCount();
+            });
+        }
+
+        function showKnockModal(deviceName, peerId) {
+            document.getElementById('knock-msg').innerHTML = `<span class="text-white font-bold">${deviceName}</span> wants to join.`;
+            
+            // Clone buttons to remove old listeners
+            const denyBtn = document.getElementById('deny-knock-btn');
+            const allowBtn = document.getElementById('allow-knock-btn');
+            
+            const newDeny = denyBtn.cloneNode(true);
+            const newAllow = allowBtn.cloneNode(true);
+            
+            denyBtn.parentNode.replaceChild(newDeny, denyBtn);
+            allowBtn.parentNode.replaceChild(newAllow, allowBtn);
+
+            newDeny.addEventListener('click', () => {
+                const conn = state.pendingKnocks.get(peerId);
+                if(conn) {
+                    conn.send({ type: 'reject' });
+                    setTimeout(() => conn.close(), 100);
+                }
+                state.pendingKnocks.delete(peerId);
+                closeModal();
+            });
+
+            newAllow.addEventListener('click', () => {
+                const conn = state.pendingKnocks.get(peerId);
+                if(conn) {
+                    acceptConnection(conn);
+                }
+                state.pendingKnocks.delete(peerId);
+                closeModal();
+            });
+
+            openModal('knock');
+        }
+
+        function acceptConnection(conn) {
+            state.approvedPeers.add(conn.peer);
+            state.conns.push(conn);
+            conn.send({ type: 'welcome' });
+            // Send current state immediately
+            conn.send({ type: 'sync-text', content: dom.text.value });
+            updatePeerCount();
+            showToast('success', 'Device Connected', 'Sync active');
+        }
+
+        // --- Shared Data Handling ---
         function handleData(data, senderConn) {
             switch(data.type) {
                 case 'sync-text':
@@ -381,14 +508,12 @@
                     break;
 
                 case 'file-meta':
-                    // Prepare to receive file
                     addFileToUI(data.meta, 'receiving');
                     break;
 
                 case 'file-chunk':
-                    // Receive actual file data
                     handleReceivedFile(data.meta, data.blob);
-                    if (state.isHost) broadcast(data, senderConn); // Host relays files too
+                    if (state.isHost) broadcast(data, senderConn);
                     break;
             }
         }
@@ -399,8 +524,7 @@
             });
         }
 
-        // --- File Handling ---
-
+        // --- File Handling (Same as before) ---
         function sendFile(file) {
             const meta = {
                 id: crypto.randomUUID(),
@@ -409,16 +533,9 @@
                 type: file.type,
                 timestamp: Date.now()
             };
-
-            // Add to own UI
             addFileToUI(meta, 'sent');
             showToast('info', 'Sending File...', file.name);
-
-            // Send Meta first
             broadcast({ type: 'file-meta', meta: meta });
-
-            // Send Data (PeerJS handles binary blobs)
-            // Note: Large files might need chunking, keeping it simple for <10MB for stability in this demo
             const blob = new Blob([file], { type: file.type });
             broadcast({ type: 'file-chunk', meta: meta, blob: blob });
         }
@@ -426,29 +543,24 @@
         function handleReceivedFile(meta, blob) {
             const receivedBlob = new Blob([blob], { type: meta.type });
             const url = URL.createObjectURL(receivedBlob);
-            
             updateFileUI(meta.id, url);
             showToast('success', 'File Received', meta.name);
         }
 
         // --- UI Logic ---
-
         function setupUIListeners() {
-            // Text Sync
             dom.text.addEventListener('input', () => {
                 if(state.isInternalUpdate) return;
                 const content = dom.text.value;
                 updateTextStats();
-                
                 const msg = { type: 'sync-text', content: content };
                 if (state.isHost) broadcast(msg);
                 else state.conns.forEach(c => c.send(msg));
             });
 
-            // Buttons
             document.getElementById('copy-btn').addEventListener('click', () => {
                 navigator.clipboard.writeText(dom.text.value);
-                showToast('success', 'Copied', 'Text copied to clipboard');
+                showToast('success', 'Copied', 'Text copied');
             });
 
             document.getElementById('clear-btn').addEventListener('click', () => {
@@ -456,11 +568,8 @@
                 dom.text.dispatchEvent(new Event('input'));
             });
 
-            // File Drag & Drop
-            dom.dropZone.addEventListener('dragover', (e) => {
-                e.preventDefault();
-                dom.dropZone.classList.add('drag-active');
-            });
+            dom.dropZone.addEventListener('click', () => dom.fileInput.click());
+            dom.dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dom.dropZone.classList.add('drag-active'); });
             dom.dropZone.addEventListener('dragleave', () => dom.dropZone.classList.remove('drag-active'));
             dom.dropZone.addEventListener('drop', (e) => {
                 e.preventDefault();
@@ -471,7 +580,7 @@
                 if (e.target.files.length) sendFile(e.target.files[0]);
             });
 
-            // Tabs (Mobile)
+            // Mobile Tabs
             dom.tabs.text.addEventListener('click', () => switchTab('text'));
             dom.tabs.files.addEventListener('click', () => switchTab('files'));
 
@@ -480,7 +589,7 @@
             document.getElementById('join-btn').addEventListener('click', () => openModal('join'));
             document.querySelectorAll('.close-modal').forEach(b => b.addEventListener('click', closeModal));
             dom.modal.overlay.addEventListener('click', (e) => {
-                if (e.target === dom.modal.overlay) closeModal();
+                if (e.target === dom.modal.overlay) closeModal(); // Close only if not knocking
             });
 
             document.getElementById('confirm-join-btn').addEventListener('click', () => {
@@ -495,26 +604,31 @@
 
         function switchTab(tab) {
             if (tab === 'text') {
-                dom.tabs.text.className = "px-3 py-1.5 rounded-md text-xs font-medium bg-white/10 text-white transition-all";
+                dom.tabs.text.className = "px-3 py-1.5 rounded-md text-xs font-medium bg-white/10 text-white transition-all shadow-sm";
                 dom.tabs.files.className = "px-3 py-1.5 rounded-md text-xs font-medium text-slate-400 hover:text-white transition-all";
-                dom.tabs.panelText.classList.remove('-translate-x-full', 'opacity-0');
-                dom.tabs.panelFiles.classList.add('translate-x-full');
+                
+                dom.tabs.panelText.classList.remove('panel-hidden');
+                dom.tabs.panelText.classList.add('panel-active');
+                
+                dom.tabs.panelFiles.classList.add('panel-hidden');
+                dom.tabs.panelFiles.classList.remove('panel-active');
             } else {
-                dom.tabs.files.className = "px-3 py-1.5 rounded-md text-xs font-medium bg-white/10 text-white transition-all";
+                dom.tabs.files.className = "px-3 py-1.5 rounded-md text-xs font-medium bg-white/10 text-white transition-all shadow-sm";
                 dom.tabs.text.className = "px-3 py-1.5 rounded-md text-xs font-medium text-slate-400 hover:text-white transition-all";
-                dom.tabs.panelText.classList.add('-translate-x-full', 'opacity-0');
-                dom.tabs.panelFiles.classList.remove('translate-x-full');
+                
+                dom.tabs.panelText.classList.add('panel-hidden');
+                dom.tabs.panelText.classList.remove('panel-active');
+                
+                dom.tabs.panelFiles.classList.remove('panel-hidden');
+                dom.tabs.panelFiles.classList.add('panel-active');
             }
         }
 
-        // --- Renderers ---
-
         function addFileToUI(meta, status) {
             dom.emptyFiles.style.display = 'none';
-            
             const div = document.createElement('div');
             div.id = `file-${meta.id}`;
-            div.className = "slide-up bg-white/5 border border-white/5 rounded-xl p-3 flex items-center gap-3 group hover:bg-white/10 transition-colors";
+            div.className = "bg-white/5 border border-white/5 rounded-xl p-3 flex items-center gap-3 group hover:bg-white/10 transition-colors animate-[slideUp_0.3s_ease-out]";
             
             const iconClass = meta.type.includes('image') ? 'fa-image text-purple-400' : 
                               meta.type.includes('pdf') ? 'fa-file-pdf text-red-400' : 'fa-file text-blue-400';
@@ -536,7 +650,6 @@
                     </div>
                 </div>
             `;
-            
             dom.fileList.prepend(div);
         }
 
@@ -545,21 +658,17 @@
             if (el) {
                 const badge = el.querySelector('.status-badge');
                 const link = el.querySelector('.download-link');
-                
                 badge.innerText = "Received";
                 badge.className = "status-badge text-[10px] uppercase font-bold tracking-wider text-emerald-400";
-                
                 link.href = url;
-                link.download = ""; // Use original name from logic if tracked, currently just reliable download
+                link.download = ""; 
                 link.classList.remove('hidden');
             }
         }
 
         function openQR() {
-            // Generate link manually
             const baseUrl = window.location.href.split('?')[0];
             const link = `${baseUrl}?host=${state.myId}`;
-            
             document.getElementById('qrcode').innerHTML = "";
             new QRCode(document.getElementById('qrcode'), {
                 text: link,
@@ -569,14 +678,11 @@
                 colorLight : "#ffffff"
             });
             document.getElementById('host-id-display').value = state.myId;
-            
-            // Copy ID Button
             document.getElementById('copy-id-btn').onclick = () => {
                 document.getElementById('host-id-display').select();
                 document.execCommand('copy');
-                showToast('success', 'Copied', 'ID copied to clipboard');
+                showToast('success', 'Copied', 'ID copied');
             };
-
             openModal('qr');
         }
 
@@ -605,18 +711,13 @@
             const icon = document.getElementById('toast-icon');
             const titleEl = document.getElementById('toast-title');
             const msgEl = document.getElementById('toast-msg');
-
             icon.className = type === 'success' ? 'fa-solid fa-check text-emerald-400' : 
                              type === 'error' ? 'fa-solid fa-triangle-exclamation text-red-400' : 'fa-solid fa-bell text-indigo-400';
-            
             titleEl.innerText = title;
             msgEl.innerText = msg;
-
             toast.classList.remove('translate-y-20', 'opacity-0');
             setTimeout(() => toast.classList.add('translate-y-20', 'opacity-0'), 3000);
         }
-
-        // --- Helpers ---
 
         function setStatus(type, msg) {
             dom.statusText.innerText = msg;
@@ -628,12 +729,12 @@
 
         function updatePeerCount() {
             const count = state.conns.length + 1;
-            dom.peerCount.innerHTML = `<i class="fa-solid fa-user-group mr-1"></i> ${count} Device${count !== 1 ? 's' : ''}`;
+            dom.peerCount.innerHTML = `<i class="fa-solid fa-user-group mr-1"></i> ${count}`;
         }
 
         function updateTextStats() {
             const len = dom.text.value.length;
-            dom.charCount.innerText = `${len} char${len !== 1 ? 's' : ''}`;
+            dom.charCount.innerText = `${len} chars`;
         }
 
         function highlightUpdate() {
@@ -650,12 +751,11 @@
         }
 
         function formatBytes(bytes, decimals = 2) {
-            if (!+bytes) return '0 Bytes';
+            if (!+bytes) return '0 B';
             const k = 1024;
-            const dm = decimals < 0 ? 0 : decimals;
-            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const sizes = ['B', 'KB', 'MB', 'GB'];
             const i = Math.floor(Math.log(bytes) / Math.log(k));
-            return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`;
+            return `${parseFloat((bytes / Math.pow(k, i)).toFixed(decimals))} ${sizes[i]}`;
         }
 
         init();
