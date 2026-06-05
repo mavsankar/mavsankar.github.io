@@ -26,6 +26,12 @@ export const onRenderBody = ({ setHeadComponents, setHtmlAttributes }) => {
          });
        `
       }}
+    />,
+    <script
+      key="google-adsense"
+      async
+      src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6963103368727733"
+      crossOrigin="anonymous"
     />
   ]);
   setHtmlAttributes({ lang: "en" });
