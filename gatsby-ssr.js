@@ -32,7 +32,13 @@ export const onRenderBody = ({ setHeadComponents, setHtmlAttributes }) => {
       async
       src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6963103368727733"
       crossOrigin="anonymous"
-    />
+    />,
+    <script
+      key="disable-auto-ads"
+      dangerouslySetInnerHTML={{
+        __html: `(adsbygoogle = window.adsbygoogle || []).pauseAdRequests = 1;`
+      }}
+    />,
   ]);
   setHtmlAttributes({ lang: "en" });
 };
