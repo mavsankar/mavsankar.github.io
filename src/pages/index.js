@@ -3,18 +3,11 @@ import { StaticImage } from 'gatsby-plugin-image'
 import Seo from '../components/seo'
 import {
   RiArrowRightUpLine, RiDownloadLine, RiGithubFill, RiLinkedinBoxFill, RiMailLine,
-  RiMapPin2Line, RiQuillPenLine, RiRobotLine, RiServerLine, RiAwardLine, RiGraduationCapLine,
+  RiMapPin2Line, RiQuillPenLine, RiRobotLine, RiServerLine, RiGraduationCapLine,
 } from 'react-icons/ri';
 import cv from '../assets/files/Software_Engineer_Resume.pdf';
 
 /* ---------- Content (from the 2026 resume) ---------- */
-
-const stats = [
-  { value: '6+ yrs', label: 'building at Microsoft' },
-  { value: 'Weeks → days', label: 'test-cycle time cut' },
-  { value: '~10', label: 'vendor engineers led' },
-  { value: '25+', label: 'self-hosted services' },
-];
 
 const microsoftRoles = [
   { title: 'Software Engineer II', dates: '2023 – Present' },
@@ -46,8 +39,8 @@ const projects = [
   {
     icon: RiServerLine,
     title: 'Home server',
-    href: 'https://github.com/mavsankar/HomeServer',
-    linkText: 'github.com/mavsankar/HomeServer',
+    href: 'https://blog.mavsankar.com/categories/homelab-series/',
+    linkText: 'blog.mavsankar.com · Homelab series',
     text: '25+ self-hosted services with Docker, GitOps CI/CD, monitoring and local LLMs. Built and run with Claude Code.',
     tags: ['Docker', 'GitOps', 'Monitoring', 'Local LLMs'],
   },
@@ -71,13 +64,6 @@ const skills = [
 const education = [
   { degree: 'M.Tech, Cyber Security', school: 'BITS Pilani', meta: '2023 – 2024 · CGPA 9.15' },
   { degree: 'B.Tech (Honours)', school: 'IIITDM Kancheepuram', meta: '2016 – 2020 · CGPA 9.24' },
-];
-
-const recognition = [
-  { title: 'Special Stock Award', meta: 'Microsoft · 2024' },
-  { title: 'GATE 2021', meta: 'All India Rank 613' },
-  { title: 'ACM-ICPC Regionals', meta: 'Competed 2 years' },
-  { title: 'Technical Advisor', meta: 'FSRTI · volunteer' },
 ];
 
 const publications = [
@@ -183,17 +169,6 @@ const IndexPage = () => {
             </div>
           </div>
         </div>
-
-        {/* Stats */}
-        <dl className="mt-16 grid grid-cols-2 gap-px overflow-hidden rounded-2xl border border-slate-200 bg-slate-200 dark:border-slate-800 dark:bg-slate-800 sm:grid-cols-4">
-          {stats.map((s) => (
-            <div key={s.label} className="bg-white p-5 dark:bg-slate-950">
-              <dt className="sr-only">{s.label}</dt>
-              <dd className="text-xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-2xl">{s.value}</dd>
-              <dd className="mt-1 text-sm text-slate-500 dark:text-slate-400">{s.label}</dd>
-            </div>
-          ))}
-        </dl>
       </section>
 
       {/* Experience */}
@@ -292,38 +267,23 @@ const IndexPage = () => {
         </div>
       </section>
 
-      {/* Education & recognition */}
+      {/* Education */}
       <section id="education" className="py-12 sm:py-16">
-        <SectionHeading index="04" title="Education & Recognition" subtitle="Background" />
-        <div className="grid gap-6 md:grid-cols-2">
-          <div className="card">
-            <h3 className="mb-4 flex items-center gap-2 font-semibold text-slate-900 dark:text-white">
-              <RiGraduationCapLine className="text-blue-600 dark:text-blue-400" size={20} /> Education
-            </h3>
-            <ul className="space-y-5">
-              {education.map((e) => (
-                <li key={e.degree}>
-                  <p className="font-semibold text-slate-900 dark:text-white">{e.degree}</p>
-                  <p className="text-slate-600 dark:text-slate-300">{e.school}</p>
-                  <p className="text-sm text-slate-500 dark:text-slate-400">{e.meta}</p>
-                </li>
-              ))}
-            </ul>
-          </div>
-          <div className="card">
-            <h3 className="mb-4 flex items-center gap-2 font-semibold text-slate-900 dark:text-white">
-              <RiAwardLine className="text-blue-600 dark:text-blue-400" size={20} /> Recognition
-            </h3>
-            <ul className="space-y-3">
-              {recognition.map((r) => (
-                <li key={r.title} className="border-l-2 border-blue-600 pl-3 dark:border-blue-400">
-                  <p className="font-medium text-slate-900 dark:text-white">{r.title}</p>
-                  <p className="text-sm text-slate-500 dark:text-slate-400">{r.meta}</p>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </div>
+        <SectionHeading index="04" title="Education" subtitle="Background" />
+        <ul className="grid gap-6 md:grid-cols-2">
+          {education.map((e) => (
+            <li key={e.degree} className="card flex items-start gap-4">
+              <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-blue-50 text-blue-600 dark:bg-blue-500/10 dark:text-blue-400">
+                <RiGraduationCapLine size={22} />
+              </span>
+              <div>
+                <p className="font-semibold text-slate-900 dark:text-white">{e.degree}</p>
+                <p className="text-slate-600 dark:text-slate-300">{e.school}</p>
+                <p className="text-sm text-slate-500 dark:text-slate-400">{e.meta}</p>
+              </div>
+            </li>
+          ))}
+        </ul>
       </section>
 
       {/* Publications */}
