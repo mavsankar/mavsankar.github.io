@@ -342,27 +342,6 @@ const IndexPage = () => {
           ))}
         </ul>
       </section>
-
-      {/* Contact */}
-      <section id="contact" className="py-12 sm:py-20">
-        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-blue-700 via-blue-600 to-sky-500 px-6 py-12 text-center text-white shadow-lg sm:px-12">
-          <div aria-hidden="true" className="absolute -right-16 -top-16 h-56 w-56 rounded-full border-[28px] border-white/10" />
-          <div aria-hidden="true" className="absolute -bottom-20 -left-10 h-48 w-48 rounded-full bg-white/10" />
-          <p className="font-mono text-xs uppercase tracking-widest text-blue-100">06 · Contact</p>
-          <h2 className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl">Let's talk.</h2>
-          <p className="mx-auto mt-3 max-w-xl text-blue-50">
-            Want to chat about AI agents, cloud backends or homelabs? My inbox is open.
-          </p>
-          <div className="relative mt-8 flex flex-wrap justify-center gap-3">
-            <a href="mailto:mavsankar@gmail.com" className="btn bg-white text-blue-700 hover:bg-blue-50">
-              <RiMailLine size={18} /> mavsankar@gmail.com
-            </a>
-            <a href="https://www.linkedin.com/in/mavsankar" target="_blank" rel="noreferrer" className="btn border border-white/40 text-white hover:bg-white/10">
-              <RiLinkedinBoxFill size={18} /> LinkedIn
-            </a>
-          </div>
-        </div>
-      </section>
     </>
   )
 }
