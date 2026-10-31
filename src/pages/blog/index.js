@@ -6,7 +6,7 @@ import Seo from '../../components/seo'
 const BlogPage = ({data}) => {
   return (
     <div pageTitle='Blog'>
-      <h1 className="text-3xl font-bold my-4">Blog</h1>
+      <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white mt-12 mb-4">Blog</h1>
       <p className='mb-2'>This is a blog. Don't hesitate to check the articles.</p>
       {
         data.allMdx.nodes.map((node) => (

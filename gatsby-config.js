@@ -4,9 +4,9 @@
 
 module.exports = {
   siteMetadata: {
-    title: `Portfolio`,
-    description: `This a sample portfolio website.`,
-    siteUrl: `https://www.yourdomain.tld`
+    title: `Sankar Mantripragada`,
+    description: `Software Engineer II at Microsoft building AI agents and high-scale .NET / Azure backends.`,
+    siteUrl: `https://www.mavsankar.com`
   },
   plugins: [
     "gatsby-plugin-postcss",

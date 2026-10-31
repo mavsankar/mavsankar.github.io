@@ -1,0 +1,96 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#1e40af"/>
+      <stop offset="0.55" stop-color="#2563eb"/>
+      <stop offset="1" stop-color="#38bdf8"/>
+    </linearGradient>
+    <linearGradient id="hoodie" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#1e293b"/>
+      <stop offset="1" stop-color="#0f172a"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.5" cy="0.42" r="0.5">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0.22"/>
+      <stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
+    </radialGradient>
+    <clipPath id="circle"><circle cx="256" cy="256" r="256"/></clipPath>
+  </defs>
+
+  <g clip-path="url(#circle)">
+    <rect width="512" height="512" fill="url(#bg)"/>
+    <circle cx="256" cy="220" r="230" fill="url(#glow)"/>
+
+    <!-- subtle orbit rings -->
+    <circle cx="256" cy="256" r="214" fill="none" stroke="#ffffff" stroke-opacity="0.10" stroke-width="2"/>
+    <circle cx="256" cy="256" r="170" fill="none" stroke="#ffffff" stroke-opacity="0.07" stroke-width="2"/>
+    <circle cx="470" cy="256" r="6" fill="#ffffff" fill-opacity="0.5"/>
+    <circle cx="96" cy="150" r="4" fill="#ffffff" fill-opacity="0.45"/>
+
+    <!-- code badge -->
+    <g transform="translate(366 92) rotate(8)">
+      <rect x="0" y="0" width="84" height="58" rx="14" fill="#ffffff"/>
+      <path d="M30 17 L18 29 L30 41" fill="none" stroke="#2563eb" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M54 17 L66 29 L54 41" fill="none" stroke="#2563eb" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M46 14 L38 44" fill="none" stroke="#f59e0b" stroke-width="6" stroke-linecap="round"/>
+    </g>
+
+    <!-- sparkle -->
+    <path d="M86 300 l6 -16 l6 16 l16 6 l-16 6 l-6 16 l-6 -16 l-16 -6 z" fill="#fde68a"/>
+
+    <!-- shoulders / hoodie -->
+    <path d="M70 512 C 78 418, 158 372, 256 372 C 354 372, 434 418, 442 512 Z" fill="url(#hoodie)"/>
+    <!-- hood collar -->
+    <path d="M178 384 C 196 432, 316 432, 334 384 C 312 396, 200 396, 178 384 Z" fill="#334155"/>
+    <!-- drawstrings -->
+    <path d="M226 410 L222 470" stroke="#e2e8f0" stroke-width="6" stroke-linecap="round"/>
+    <path d="M286 410 L290 470" stroke="#e2e8f0" stroke-width="6" stroke-linecap="round"/>
+    <circle cx="222" cy="474" r="6" fill="#f59e0b"/>
+    <circle cx="290" cy="474" r="6" fill="#f59e0b"/>
+
+    <!-- neck -->
+    <path d="M220 316 L292 316 L296 392 C 276 404, 236 404, 216 392 Z" fill="#b5764f"/>
+    <path d="M220 330 C 240 352, 272 352, 292 330 L292 316 L220 316 Z" fill="#9c6342"/>
+
+    <!-- ears -->
+    <ellipse cx="164" cy="246" rx="20" ry="26" fill="#c4825a"/>
+    <ellipse cx="348" cy="246" rx="20" ry="26" fill="#c4825a"/>
+    <ellipse cx="166" cy="246" rx="9" ry="13" fill="#a96a46"/>
+    <ellipse cx="346" cy="246" rx="9" ry="13" fill="#a96a46"/>
+
+    <!-- head -->
+    <ellipse cx="256" cy="236" rx="90" ry="104" fill="#cf8f66"/>
+
+    <!-- hair -->
+    <path d="M162 238 C 150 150, 204 110, 262 112 C 324 114, 366 156, 350 238
+             C 344 204, 330 186, 312 176 C 286 192, 226 194, 196 172
+             C 180 188, 168 210, 162 238 Z" fill="#1c1715"/>
+    <path d="M196 172 C 214 150, 250 140, 290 150 C 270 156, 236 164, 214 182 Z" fill="#2c2420"/>
+
+    <!-- eyebrows -->
+    <path d="M204 208 Q 222 198 240 206" fill="none" stroke="#1c1715" stroke-width="8" stroke-linecap="round"/>
+    <path d="M272 206 Q 290 198 308 208" fill="none" stroke="#1c1715" stroke-width="8" stroke-linecap="round"/>
+
+    <!-- eyes -->
+    <ellipse cx="222" cy="234" rx="9" ry="11" fill="#1c1715"/>
+    <ellipse cx="290" cy="234" rx="9" ry="11" fill="#1c1715"/>
+    <circle cx="225" cy="230" r="3" fill="#ffffff"/>
+    <circle cx="293" cy="230" r="3" fill="#ffffff"/>
+
+    <!-- nose -->
+    <path d="M256 240 Q 246 268 260 272" fill="none" stroke="#a96a46" stroke-width="6" stroke-linecap="round"/>
+
+    <!-- cheeks -->
+    <ellipse cx="198" cy="270" rx="14" ry="8" fill="#e38b6d" fill-opacity="0.45"/>
+    <ellipse cx="314" cy="270" rx="14" ry="8" fill="#e38b6d" fill-opacity="0.45"/>
+
+    <!-- beard -->
+    <path d="M166 246 C 166 318, 206 352, 256 352 C 306 352, 346 318, 346 246
+             C 338 280, 322 296, 300 290 C 282 284, 230 284, 212 290
+             C 190 296, 174 280, 166 246 Z" fill="#2a211d"/>
+    <!-- moustache -->
+    <path d="M216 292 C 232 276, 280 276, 296 292 C 280 288, 232 288, 216 292 Z" fill="#2a211d"/>
+    <!-- smile -->
+    <path d="M232 302 Q 256 326 280 302 Z" fill="#ffffff"/>
+    <path d="M232 302 Q 256 326 280 302" fill="none" stroke="#7a2e2e" stroke-width="3" stroke-linejoin="round"/>
+  </g>
+</svg>

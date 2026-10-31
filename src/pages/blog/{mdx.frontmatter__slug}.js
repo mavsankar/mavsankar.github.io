@@ -5,9 +5,9 @@ import Seo from '../../components/seo'
 const BlogPost = ({ data, children }) => {
   return (
     <div>
-      <h1 className='text-3xl font-bold mb-2'>{data.mdx.frontmatter.title}</h1>
-      <p className='mb-4'>{data.mdx.frontmatter.date}</p>
-      {children}
+      <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white mt-12 mb-2">{data.mdx.frontmatter.title}</h1>
+      <p className="mb-8 text-sm text-slate-500 dark:text-slate-400">{data.mdx.frontmatter.date}</p>
+      <div className="prose-post pb-12">{children}</div>
     </div>
   )
 }

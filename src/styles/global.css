@@ -1,98 +1,52 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-@import url('../assets/academicons/css/academicons.min.css');
 
-.ai-size-32 {
-    font-size: 32px;
-  }  
-
-   /* From Uiverse.io by jeremyssocial */ 
-/* Terminal Window */
-.terminal {
-  width: 500px;
-  background-color: #000;
-  color: #0f0;
-  font-family: "Courier New", Courier, monospace;
-  border-radius: 8px;
-  overflow: hidden;
-  box-shadow: 0 0 15px rgba(0, 0, 0, 0.4);
-}
-
-/* Terminal Header */
-.terminal-header {
-  background-color: #333;
-  padding: 5px;
-  display: flex;
-  align-items: center;
-  color: #fff;
-}
-
-.buttons {
-  display: flex;
-  margin-right: 15px;
-}
-
-.buttons span {
-  height: 15px;
-  width: 15px;
-  border-radius: 50%;
-  display: inline-block;
-  margin-right: 5px;
-}
-
-.close {
-  background-color: #ff605c;
-}
-.minimize {
-  background-color: #ffbd44;
-}
-.maximize {
-  background-color: #00ca4e;
-}
-
-.title {
-  flex-grow: 1;
-  text-align: center;
-}
-
-/* Terminal Body */
-.terminal-body {
-  padding: 10px;
-}
-
-.terminal-loader {
-  display: inline-flex;
-  align-items: center;
-}
-
-.loader-text {
-  margin-right: 5px;
-}
-
-.dot {
-  opacity: 0;
-  animation: dotFadeInOut 1.5s infinite;
-}
-
-@keyframes dotFadeInOut {
-  0%,
-  100% {
-    opacity: 0;
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    @apply bg-white text-slate-800;
   }
-  50% {
-    opacity: 1;
+  ::selection {
+    @apply bg-blue-200 text-slate-900 dark:bg-blue-500/40 dark:text-white;
+  }
+  section[id] {
+    scroll-margin-top: 5rem;
   }
 }
 
-#dot1 {
-  animation-delay: 0.5s;
+/* The `dark:` variant only targets descendants of .dark, so <html> itself needs its own rule.
+   Plain values (no @apply) so Tailwind leaves the selector alone. */
+html[class~="dark"] {
+  background-color: #020617; /* slate-950 */
+  color: #e2e8f0; /* slate-200 */
+  color-scheme: dark;
 }
 
-#dot2 {
-  animation-delay: 0.6s;
-}
-
-#dot3 {
-  animation-delay: 0.7s;
+@layer components {
+  .card {
+    @apply rounded-2xl border border-slate-200 bg-white/70 p-6 shadow-sm transition
+      dark:border-slate-800 dark:bg-slate-900/60;
+  }
+  .card-hover {
+    @apply hover:-translate-y-0.5 hover:border-blue-300 hover:shadow-md dark:hover:border-blue-500/50;
+  }
+  .tag {
+    @apply inline-flex items-center rounded-md border border-slate-200 bg-slate-50 px-2 py-0.5 text-xs font-medium text-slate-700
+      dark:border-slate-700 dark:bg-slate-800/70 dark:text-slate-300;
+  }
+  .btn {
+    @apply inline-flex items-center gap-2 rounded-lg px-4 py-2.5 text-sm font-semibold transition;
+  }
+  .btn-primary {
+    @apply btn bg-blue-600 text-white shadow-sm hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-400 dark:text-slate-950;
+  }
+  .btn-ghost {
+    @apply btn border border-slate-300 text-slate-700 hover:border-slate-400 hover:bg-slate-50
+      dark:border-slate-700 dark:text-slate-200 dark:hover:border-slate-500 dark:hover:bg-slate-900;
+  }
+  .prose-post p { @apply mb-4 leading-7; }
+  .prose-post h2 { @apply mt-8 mb-3 text-2xl font-bold; }
+  .prose-post a { @apply text-blue-600 underline dark:text-blue-400; }
 }
